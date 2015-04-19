@@ -12,7 +12,7 @@
 
 ## Using the model
 1. `features.py` - performs sequence feature extraction of CpG content, conservation, and TATA box affinity
-2. mirna_proximity.py
+2. `mirna_proximity.py` - performs miRNA proximity feature extraction (requires the use of miRBase files)
 3. gff_unify_features.py
 4. `promirna.py` - module of core mathematical formulas from PROmiRNA
 5. promi2.py
