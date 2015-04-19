@@ -11,7 +11,7 @@
 - miRBase (I have provided v20)
 
 ### Additional input files
-These are large files; you can find them included in the [ExternalData](http://promirna.molgen.mpg.de)
+These are large files; you can find them included in the [ExternalData](http://promirna.molgen.mpg.de) of PROmiRNA
 - PhastCons: `track_000.chr*.wib`
 - TATA box affinity: `TATA_box_jaspar.psem`
 - Files related to the human genome:
