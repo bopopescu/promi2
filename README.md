@@ -8,9 +8,10 @@
 - [Bedtools](http://bedtools.readthedocs.org/en/latest/)
 - [ANNOTATE 3.04 (TRAP: Transcription Factor Affinity Prediction)](http://www.mybiosoftware.com/trap-3-04-transcription-factor-affinity-prediction.html)
 - BIO::Graphics perl module (for e.g. Bio/Graphics/Wiggle.pm)
-- miRBase (I have provided v20)
 
 ### Additional input files
+- miRBase (I have provided v20): `hsa.gff2`, `mirna.txt`, `mirna_context.txt`
+
 These are large files; you can find them included in the [ExternalData](http://promirna.molgen.mpg.de) of PROmiRNA
 - PhastCons: `track_000.chr*.wib`
 - TATA box affinity: `TATA_box_jaspar.psem`
