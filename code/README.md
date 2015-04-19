@@ -1,4 +1,4 @@
-## Scripts in this repo
+# Scripts in this repo
 
 ## Generic
 - `utils.py` - module of utility functions
