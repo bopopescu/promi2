@@ -18,7 +18,9 @@
 5. `promi2.py` - runs scripts 1-4 of "using the model"
 
 ```
-python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2
+## You need to first update "config.ini"
+
+python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2 -c config.ini
 ```
 
 ## Summarizing results

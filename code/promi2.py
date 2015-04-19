@@ -197,7 +197,7 @@ Tab-separated columns should be like:
 ''')
     parser.add_argument('-f', dest='is_gff',
                         action='store_true',
-                        help='flat to specify that infile is already features.gff file')
+                        help='flag to specify that infile is already features.gff file')
 
     parser.add_argument('-c', '--config', dest='f_config',
                         default='config.ini',

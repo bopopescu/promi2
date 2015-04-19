@@ -21,17 +21,21 @@ These are large files; you can find them included in the [ExternalData](http://p
   - `hg19.chrom.sizes`
   - `Homo_sapiens.GRCh37.75.gtf`
 
-## Input format
-- gff format with the following 9 tab-separated columns
- 1. chromosome
- 2. source (field is not used)
- 3. feature (field is not used)
- 4. start of 1kb region around TSS (-500 of mid putative TSS)
- 5. stop of 1kb region around TSS (+500 of mid putative TSS)
- 6. normalized tag counts
- 7. strand
- 8. '.' (field is not used)
- 9. 'start:<start>;stop:<stop>' of putative TSS
+## Input files
+### 1. File containing the putative TSSs you want to classify
+This file is in gff format -- so 9 tab-delimited columns:
+1. chromosome
+2. source (field is not used)
+3. feature (field is not used)
+4. start of 1kb region around TSS (-500 of mid putative TSS)
+5. stop of 1kb region around TSS (+500 of mid putative TSS)
+6. normalized tag counts
+7. strand
+8. '.' (field is not used)
+9. 'start:<start>;stop:<stop>' of putative TSS
+
+### 3. Config file
+There is also a config file you need to update.
 
 ## Reference
 1. Marsico A, Huska MR, Lasserre J, Hu H, Vucicevic D, Musahl A, Orom U, Vingron M. (2013). [PROmiRNA: a new miRNA promoter recognition method uncovers the complex regulation of intronic miRNAs](http://genomebiology.com/2013/14/8/R84). Genome Biology, 14(8):R84. doi: 10.1186/gb-2013-14-8-r84.
