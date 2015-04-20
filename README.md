@@ -23,7 +23,7 @@ These are large files; you can find them included in the [ExternalData](http://p
 
 ## Input files
 ### 1. File containing the putative TSSs you want to classify
-This file is in gff format -- so 9 tab-delimited columns:
+This file is in gff format -- so the following 9 tab-delimited columns:
 
 1. chromosome
 2. source (field is not used)
