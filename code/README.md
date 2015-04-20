@@ -4,7 +4,7 @@
 - `utils.py` - module of utility functions
 
 ## Creating the training set
-1. `tc_normalization.py` - performs rle normalization on tag counts (used for the negative set)
+1. `tc_normalization.py` - performs rle normalization on tag counts (used for creating the negative training set)
 2. create-training-set.py
 
 ```
