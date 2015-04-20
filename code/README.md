@@ -15,7 +15,13 @@ python2.7 create-training-set.py -f '/path/to/*.gff' -o ../Testout-tset -c confi
 **Note:** `-f` globs all sample.gff files from which to pick the positive training set; you will need quotations around `*`; and an example of the input format is found [here](../test/test.gff).
 
 ## Training the model
-1. training.py
+1. `training.py` - performs training to get model parameters
+
+```
+## You need to first update "config.ini"
+
+python2.7 training.py -i ../test/test-trainset.gff
+```
 
 ## Using the model
 1. `features.py` - performs sequence feature extraction of CpG content, conservation, and TATA box affinity
