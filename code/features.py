@@ -191,7 +191,7 @@ def build_features_matrix(sorted_gff, sorted_cpg, sorted_avcons, sorted_tata, f_
             for l in f:
                 lcount += 1
 
-                l = l.split('\t')
+                l = l.strip().split('\t')
                 c      = l[0]
                 region_up   = l[3] #500bp   upstream of start; not used
                 region_down = l[4] #500bp downstream of start; not used
