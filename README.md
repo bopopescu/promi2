@@ -24,6 +24,7 @@ These are large files; you can find them included in the [ExternalData](http://p
 ## Input files
 ### 1. File containing the putative TSSs you want to classify
 This file is in gff format -- so 9 tab-delimited columns:
+
 1. chromosome
 2. source (field is not used)
 3. feature (field is not used)
@@ -34,7 +35,7 @@ This file is in gff format -- so 9 tab-delimited columns:
 8. '.' (field is not used)
 9. 'start:<start>;stop:<stop>' of putative TSS
 
-### 3. Config file
+### 2. Config file
 There is also a config file you need to update.
 
 ## Reference
