@@ -35,8 +35,10 @@ This file is in gff format -- so the following 9 tab-delimited columns:
 8. '.' (field is not used)
 9. 'start:<start>;stop:<stop>' of putative TSS
 
+Example shown [here](test/test.gff).
+
 ### 2. Config file
-There is also a config file you need to update.
+There is also a [config](code/config.ini) file you will need to update.
 
 ## Reference
 1. Marsico A, Huska MR, Lasserre J, Hu H, Vucicevic D, Musahl A, Orom U, Vingron M. (2013). [PROmiRNA: a new miRNA promoter recognition method uncovers the complex regulation of intronic miRNAs](http://genomebiology.com/2013/14/8/R84). Genome Biology, 14(8):R84. doi: 10.1186/gb-2013-14-8-r84.
