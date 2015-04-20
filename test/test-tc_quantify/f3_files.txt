@@ -1,0 +1,5 @@
+../test/test-tc_quantify/fakeBed/b1.bed
+../test/test-tc_quantify/fakeBed/b2.bed
+../test/test-tc_quantify/fakeBed/b3.bed
+../test/test-tc_quantify/fakeBed/b4.bed
+../test/test-tc_quantify/fakeBed/b5.bed

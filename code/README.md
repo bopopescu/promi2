@@ -4,8 +4,12 @@
 - `utils.py` - module of utility functions
 
 ## Creating the training set
-1. tc_normalization.py
+1. `tc_normalization.py` - performs rle normalization on tag counts
 2. create-training-set.py
+
+```
+## You need to first update "tcnorm.ini"
+```
 
 ## Training the model
 1. training.py
