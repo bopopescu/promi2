@@ -50,7 +50,7 @@ python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2 -c config.ini
  - 9. 'start:<start>;stop:<stop>' of putative TSS
 - An example of the format is shown [here](../test/test.gff)
 
-** About: the config.ini file**
+**About: the config.ini file**
 - You will need to update the paths in the [config](config.ini) file
 
 ## Summarizing results
