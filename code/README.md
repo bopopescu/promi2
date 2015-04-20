@@ -54,4 +54,9 @@ python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2 -c config.ini
 - You will need to update the paths in the [config](config.ini) file
 
 ## Summarizing results
-1. summarize-results.py
+1. `summarize-results.py` - summarize promi2 predictions from a series of samples
+
+```
+python2.7 summarize-results.py -f '../test/test-summary/Predictions.*' -o ../Testout-summary.gff -s
+```
+**Note:** `-s` is to print only results where mirna_prox score is > 0
