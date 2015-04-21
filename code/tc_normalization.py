@@ -52,7 +52,7 @@ def main(f_config, f1_pos, f6_outdir):
     cparser = SafeConfigParser()
     cparser.read(f_config)
 
-    f2_libs        = cparser.get('tc_normalization', 'libs')
+    f2_libs        = cparser.get('tc_normalization', 'ids')
     f3_files       = cparser.get('tc_normalization', 'files')
     f4_counts      = cparser.get('tc_normalization', 'counts')
     f5_normfactors = cparser.get('tc_normalization', 'normfactors')
