@@ -139,8 +139,8 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
     cparser = SafeConfigParser()
     cparser.read(config)
 
-    tc_config = cparser.get('general', 'tcconfig')
-    m_mirna   = cparser.get('correlation', 'srnaseqmatrix') ## FIXME: add to config.ini
+    tc_config = cparser.get('configs', 'tcconfig')
+    m_mirna   = cparser.get('correlation', 'srnaseqmatrix')
 
     ## PART1: tc normalization
     ## 1a. setup infile
@@ -167,7 +167,7 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
     ensure_dir(outdir_corr)
 
     mirbase_gff2 = cparser.get('mirbase', 'gff2')
-    corrmethod   = cparser.get('correlation', 'corrmethod') ## FIXME: add to config.ini
+    corrmethod   = cparser.get('correlation', 'corrmethod')
     gff_mirna = os.path.join(outdir_corr, '4corr_mirna.gff')
     gff_tss   = os.path.join(outdir_corr, '4corr_tss.gff')
     pair_pos    = os.path.join(outdir_corr, '4corrPair_row_pos_tss-mirna.txt')
