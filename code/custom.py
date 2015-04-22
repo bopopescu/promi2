@@ -265,7 +265,6 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
                 else:
                     mirna_partner.append(['0', '0', ''])
 
-                print pairid, mirna_partner
                 ## features: cpg, cons, tata (cct)
                 for m in mirna_partner:
                     corr, mprox, mirna_info = m
