@@ -16,6 +16,7 @@ import features
 import promi2
 
 usage = """
+- Given gff infile, extract cpg,cons,tata,mprox,corr features
 - you will need to set parameters in tc-normalization
 """
 def _reformat_infile_gff2tcnorm(infile, outfile):
@@ -136,7 +137,7 @@ def _index_1kbfeatures(gff_1kbfeatures):
 
     return feature_index
 
-def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
+def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
     cparser = SafeConfigParser()
     cparser.read(config)
 
@@ -260,7 +261,9 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
                         d = mirna_proximity.calculate_distance(start, stop, mstart, mstop, strand)
                         mprox = str(mirna_proximity.distance_score(d))
 
-                        mirna_info = ';'.join([';'.join(cinfo[:-1]), 'distance:'+str(d)])
+                        mirna_info = ';'.join([';'.join(cinfo[:-1]),
+                                               'distance:'+str(d),
+                                               'corrmethod:'+corrmethod])
                         mirna_partner.append([corr, mprox, mirna_info])
                 else:
                     mirna_partner.append(['0', '0', ''])
@@ -289,7 +292,6 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
     return gff_allfeatures
 
 def main(f_config, gff_infile, outdir, has_mirna):
-    outdir = '../Testout-custom2'
     ensure_dir(outdir)
 
     cparser = SafeConfigParser()
@@ -298,15 +300,14 @@ def main(f_config, gff_infile, outdir, has_mirna):
     listoffeatures = cparser.get('promi2', 'features').split(',')
 
     ## Extract features
-    gff_allfeatures = extractFeatures_given_posPairs(f_config, gff_infile, outdir, has_mirna)
+    gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna)
 
     ## Run Promirna
     fo_predictions = os.path.join(outdir,
                                   'Predictions.%s.txt' % os.path.basename(gff_infile))
     promi2.promi2(f_params, listoffeatures, gff_allfeatures, fo_predictions)
 
-    ## Plot
-    print 'good day'
+    return fo_predictions
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
