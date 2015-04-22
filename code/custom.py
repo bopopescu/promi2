@@ -154,6 +154,14 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
     ## 1c. run
     fo_bed = tc_normalization.main(tc_config, f1_pos, outdir_tc)
 
+    ncount_dict = {}
+    with open(fo_bed) as f:
+        for l in f:
+            l = l.strip().split('\t')
+            _, chrom, start, _, stop, strand = re.split('[r:.,]', l[3])
+            pos = '.'.join([chrom, start, stop, strand])
+            ncount_dict[pos] = l[6]
+
     ## 1d. setup outfile
     f_rle = re.sub('max_tpm.bed$', 'tpm_rle.matrix', fo_bed)
 
@@ -225,6 +233,8 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
                 pairid = '.'.join([chrom, start, stop, strand, mirna])
                 tssid  = '.'.join([chrom, start, stop, strand])
 
+                ncount = ncount_dict[tssid]
+
                 for n in pairid_index[pairid]:
 
                     ## feature: correlation (corr)
@@ -255,7 +265,7 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
                                             'distance:' + str(d)])
 
                         newline = '\t'.join([chrom, '.', '.',
-                                             start, stop, '.',
+                                             start, stop, ncount,
                                              strand, newfeatures, newinfo])
                         out.write(newline + '\n')
 
