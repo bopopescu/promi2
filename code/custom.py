@@ -135,7 +135,7 @@ def _index_1kbfeatures(gff_1kbfeatures):
 
     return feature_index
 
-def extractFeatures_given_posPairs(config, gff_infile, outdir):
+def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
     cparser = SafeConfigParser()
     cparser.read(config)
 
@@ -185,7 +185,10 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
     ## position pair:
     correlation._find_miRNA_pos(m_mirna, mirbase_gff2, gff_mirna)
     correlation._get_tss_pos(f1_pos, gff_tss)
-    _interpret_tss_mirna_pairings(gff_infile, gff_mirna, pair_pos)
+    if has_mirna:
+        _interpret_tss_mirna_pairings(gff_infile, gff_mirna, pair_pos)
+    else:
+        correlation._get_tss_mirna_pairings(gff_tss, gff_mirna, pair_pos)
 
     ## sample pair:
     srnaseq_index = correlation._index_srnaseq(m_mirna)
@@ -271,8 +274,8 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
 
     return gff_allfeatures
 
-def main(f_config, gff_infile, outdir):
-    outdir = '../Testout-custom'
+def main(f_config, gff_infile, outdir, has_mirna):
+    outdir = '../Testout-custom2'
     ensure_dir(outdir)
 
     cparser = SafeConfigParser()
@@ -281,7 +284,7 @@ def main(f_config, gff_infile, outdir):
     listoffeatures = cparser.get('promi2', 'features').split(',')
 
     ## Extract features
-    gff_allfeatures = extractFeatures_given_posPairs(f_config, gff_infile, outdir)
+    gff_allfeatures = extractFeatures_given_posPairs(f_config, gff_infile, outdir, has_mirna)
 
     ## Run Promirna
     fo_predictions = os.path.join(outdir,
@@ -329,4 +332,4 @@ program does not need to look for pairs
     args = parser.parse_args()
 
     ## do something..
-    main(args.f_config, args.infile, args.outdir)
+    main(args.f_config, args.infile, args.outdir, args.has_mirna)
