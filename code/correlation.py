@@ -143,46 +143,47 @@ def _get_tss_mirna_pairings(f_tss_gff, f_mirna_gff, fo_pos_pairing):
     os.system('rm '+f_tmp)
     return
 
-
-def _get_sample_pairings(m_tss, m_mirna, fo_sample_pairing):
+def _index_cage(m_tss):
     cage_index    = {}
-    srnaseq_index = {}
-
     cage_id_pattern    = re.compile('^tpm.*(CNhs.*\..*)$')
+    with open(m_tss) as f:
+        for l in f:
+            if l.startswith('00Annotation'):
+                l = l.strip().split('\t')
+                c = 0
+                for header in l:
+                    if header.startswith('tpm'):
+                        cage_sample_id = cage_id_pattern.match(header).group(1)
+                        cage_id = cage_sample_id.split('.')[1]
+                        try:
+                            cage_index[cage_id].append('%s:%s' % (cage_sample_id, c))
+                        except KeyError:
+                            cage_index[cage_id] = ['%s:%s' % (cage_sample_id, c)]
+                    c += 1
+                break
+    return cage_index
+
+def _index_srnaseq(m_mirna):
+    srnaseq_index = {}
     srnaseq_id_pattern = re.compile('^.*(SRh.*?\..*?)\.')
+    with open(m_mirna) as f:
+        for l in f:
+            if l.startswith('ID'):
+                l = l.strip().split('\t')
+                c = 0
+                for header in l:
+                    if header.endswith('.bam'):
+                        srnaseq_sample_id = srnaseq_id_pattern.match(header).group(1)
+                        srnaseq_id = srnaseq_sample_id.split('.')[1]
+                        try:
+                            srnaseq_index[srnaseq_id].append('%s:%s' % (srnaseq_sample_id, c))
+                        except KeyError:
+                            srnaseq_index[srnaseq_id] = ['%s:%s' % (srnaseq_sample_id, c)]
+                    c += 1
+    return srnaseq_index
 
+def _get_sample_pairings(cage_index, srnaseq_index, fo_sample_pairing):
     with open(fo_sample_pairing, 'w') as out:
-        with open(m_tss) as f:
-            for l in f:
-                if l.startswith('00Annotation'):
-                    l = l.strip().split('\t')
-                    c = 0
-                    for header in l:
-                        if header.startswith('tpm'):
-                            cage_sample_id = cage_id_pattern.match(header).group(1)
-                            cage_id = cage_sample_id.split('.')[1]
-                            try:
-                                cage_index[cage_id].append('%s:%s' % (cage_sample_id, c))
-                            except KeyError:
-                                cage_index[cage_id] = ['%s:%s' % (cage_sample_id, c)]
-                        c += 1
-                    break
-
-        with open(m_mirna) as f:
-            for l in f:
-                if l.startswith('ID'):
-                    l = l.strip().split('\t')
-                    c = 0
-                    for header in l:
-                        if header.endswith('.bam'):
-                            srnaseq_sample_id = srnaseq_id_pattern.match(header).group(1)
-                            srnaseq_id = srnaseq_sample_id.split('.')[1]
-                            try:
-                                srnaseq_index[srnaseq_id].append('%s:%s' % (srnaseq_sample_id, c))
-                            except KeyError:
-                                srnaseq_index[srnaseq_id] = ['%s:%s' % (srnaseq_sample_id, c)]
-                        c += 1
-
         sample_ids = set(cage_index.keys()).intersection(srnaseq_index.keys())
         for k in sample_ids:
             for c in cage_index[k]:
@@ -259,7 +260,11 @@ def main(mirbase_gff2, m_mirna, m_tss, method, outdir):
 
         ## finding pairs
         _get_tss_mirna_pairings(fo_tss_gff, fo_mirna_gff, fo_pos_pairing)
-        _get_sample_pairings(m_tss, m_mirna, fo_sample_pairing)
+
+        cage_index    = _index_cage(m_tss)
+        srnaseq_index = _index_srnaseq(m_mirna)
+        _get_sample_pairings(cage_index, srnaseq_index, fo_sample_pairing)
+
 
         ## computing correlation
         _compute_correlation(fo_pos_pairing, fo_sample_pairing, m_tss, m_mirna, fo_corr, method)
