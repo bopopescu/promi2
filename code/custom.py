@@ -238,6 +238,7 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
 
                 ncount = ncount_dict[tssid]
 
+                if not pairid_index.has_key(pairid): continue
                 for n in pairid_index[pairid]:
 
                     ## feature: correlation (corr)
