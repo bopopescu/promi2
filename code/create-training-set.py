@@ -502,7 +502,7 @@ def main(files, outdir, N, percent_lib, is_get_id, f_config, verbose = False):
     f_traincfg   = cparser.get('configs','tcconfig')
     m_mirna      = cparser.get('training','srnaseqmatrix')
     m_tss        = cparser.get('training','cageseqmatrix')
-    corrmethod   = cparser.get('training','corrmethod')
+    corrmethod   = cparser.get('correlation','corrmethod')
     computecorr  = cparser.get('training','computecorrelation')
 
     f_trainingset = os.path.join(outdir, 'TrainingSet.gff')

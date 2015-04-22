@@ -123,7 +123,7 @@ def main(f_config, gff_cage, is_gff, outdir):
     listoffeatures = listoffeatures.split(',')
     if 'corr' in listoffeatures:
         is_consider_corr = True
-        corrmethod = cparser.get('promi2','corrmethod')
+        corrmethod = cparser.get('correlation','corrmethod')
     else:
         is_consider_corr = False
 
