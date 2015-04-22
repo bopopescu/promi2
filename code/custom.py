@@ -275,22 +275,18 @@ def main(f_config, gff_infile, outdir):
     outdir = '../Testout-custom'
     ensure_dir(outdir)
 
-    '''
     cparser = SafeConfigParser()
     cparser.read(f_config)
     f_params       = cparser.get('promi2', 'params')
     listoffeatures = cparser.get('promi2', 'features').split(',')
-    '''
 
     ## Extract features
     gff_allfeatures = extractFeatures_given_posPairs(f_config, gff_infile, outdir)
 
-    '''
     ## Run Promirna
     fo_predictions = os.path.join(outdir,
                                   'Predictions.%s.txt' % os.path.basename(gff_infile))
     promi2.promi2(f_params, listoffeatures, gff_allfeatures, fo_predictions)
-    '''
 
     ## Plot
     print 'good day'
