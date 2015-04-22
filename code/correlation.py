@@ -102,7 +102,7 @@ def _get_tss_pos(m_tss, fo_tss_gff):
                    l.startswith('01STAT'):
                     continue
 
-                tid = re.sub('^chr', '', l.split('\t')[0])
+                tid = re.sub('^chr', '', l.split('\t')[0]).strip()
                 chrom, start, _, stop, strand = re.split('[:,.]', tid)
 
                 newline = '\t'.join([chrom, 'CAGE', 'putative_tss',
