@@ -7,11 +7,17 @@ def inverse_gaussian_pdf(x, mu, lamb):
     import sys
     ## returns p(X_i | Z_k); ith region, kth class
     ## this is the 'likelihood' part
-    _a = math.pow((lamb/(2*math.pi*math.pow(x,3))), 0.5)
-    _b = math.exp((-lamb*math.pow((x-mu),2))/(2*math.pow(mu,2)*x))
-    if _b == 0: _b = sys.float_info.min
+    ## Note: use of 'sys.float_info.min' is to prevent ZeroDivisionError
+    _a = (2*math.pi*math.pow(x,3))
+    if _a == 0: _a = sys.float_info.min
+    a = math.pow((lamb/_a), 0.5)
 
-    pdf = _a * _b
+    _b = (2*math.pow(mu,2)*x)
+    if _b == 0: _b = sys.float_info.min
+    b = math.exp((-lamb*math.pow((x-mu),2))/_b)
+
+    if b == 0: b = sys.float_info.min
+    pdf = a * b
     return pdf
 
 def prior(betas, features):
