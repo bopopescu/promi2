@@ -86,10 +86,11 @@ def _index_corr_pairid(gff_corr):
         for l in f:
             c += 1
 
-            _, info = l.strip().rsplit('\t', 1)
+            chrom, _, _, start, stop, _, strand, _, info = l.strip().rsplit('\t')
             info    = info.split(';')
 
             pid = get_value_from_keycolonvalue_list('pair_id', info)
+            if pid == '': pid = '.'.join([chrom, start, stop, strand])
 
             try:
                 pairid_index[pid].append(c)
@@ -202,7 +203,6 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
 
     pairid_index = _index_corr_pairid(fo_corr)
 
-
     ## PART3: compute features
     ## compute cpg, cons, tata ...
     outdir_seqfeatures = os.path.join(outdir, 'seqfeatures/')
@@ -233,27 +233,43 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
                 chrom, _, _, start, stop, _, strand, _, mirna = l.strip().split('\t')
                 mirna = mirna.lower()
 
-                pairid = '.'.join([chrom, start, stop, strand, mirna])
+                ## setting ids...
                 tssid  = '.'.join([chrom, start, stop, strand])
 
+                if has_mirna:
+                    pairid = '.'.join([tssid, mirna])
+                else:
+                    pairid = tssid
+
+                ## getting info...
                 ncount = ncount_dict[tssid]
 
-                if not pairid_index.has_key(pairid): continue
-                for n in pairid_index[pairid]:
+                mirna_partner = []
+                if pairid_index.has_key(pairid):
+                    for n in pairid_index[pairid]:
 
-                    ## feature: correlation (corr)
-                    cline =  linecache.getline(fo_corr, n).strip().split('\t')
-                    corr  = cline[5]
-                    cinfo = cline[8].split(';')
+                        ## feature: correlation (corr)
+                        cline =  linecache.getline(fo_corr, n).strip().split('\t')
+                        corr  = cline[5]
+                        cinfo = cline[8].split(';')
 
-                    ## feature: mirna (mprox)
-                    mstart = int(get_value_from_keycolonvalue_list('mirna_start', cinfo))
-                    mstop = int(get_value_from_keycolonvalue_list('mirna_stop', cinfo))
+                        ## feature: mirna (mprox)
+                        mstart = int(get_value_from_keycolonvalue_list('mirna_start', cinfo))
+                        mstop = int(get_value_from_keycolonvalue_list('mirna_stop', cinfo))
 
-                    d = mirna_proximity.calculate_distance(start, stop, mstart, mstop, strand)
-                    mprox = str(mirna_proximity.distance_score(d))
+                        d = mirna_proximity.calculate_distance(start, stop, mstart, mstop, strand)
+                        mprox = str(mirna_proximity.distance_score(d))
 
-                    ## features: cpg, cons, tata (cct)
+                        mirna_info = ';'.join([';'.join(cinfo[:-1]), 'distance:'+str(d)])
+                        mirna_partner.append([corr, mprox, mirna_info])
+                else:
+                    mirna_partner.append(['0', '0', ''])
+
+                print pairid, mirna_partner
+                ## features: cpg, cons, tata (cct)
+                for m in mirna_partner:
+                    corr, mprox, mirna_info = m
+
                     for t in features_index[tssid]:
                         fline = linecache.getline(gff_1kbfeatures, t).strip().split('\t')
                         cct = fline[7]
@@ -264,9 +280,7 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir, has_mirna):
                                                 'mirna_prox:' + mprox,
                                                 'corr:'       + corr])
 
-                        newinfo = ';'.join([info_region,
-                                            ';'.join(cinfo[:-1]),
-                                            'distance:' + str(d)])
+                        newinfo = ';'.join([info_region, mirna_info])
 
                         newline = '\t'.join([chrom, '.', '.',
                                              start, stop, ncount,
