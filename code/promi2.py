@@ -48,7 +48,7 @@ def _make_prediction(prior_prom, p_prom, p_back):
 
     return prediction
 
-def promi2(f_param, listoffeatures, infile, outfile,):
+def promi2(f_param, listoffeatures, infile, outfile):
     mu1, mu2, lambda1, lambda2, betas = _read_params(f_param)
 
     if len(betas) != len(listoffeatures)+1:
