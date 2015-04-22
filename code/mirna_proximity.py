@@ -20,6 +20,19 @@ def distance_score(d):
     score = math.pow((1.0+float(d)/1000),-1)
     return score
 
+def calculate_distance(peak_start, peak_stop,
+                  mirna_start, mirna_stop,
+                  strand):
+    if strand == '+':
+        peak_start  = int(peak_start)
+        mirna_start = int(mirna_start)
+        d = mirna_start - peak_start
+    else:
+        peak_stop  = int(peak_stop)
+        mirna_stop = int(mirna_stop)
+        d = peak_stop - mirna_stop
+    return d
+
 def _is_chr_in_dataline(somefile):
     with open(somefile) as f:
         for l in f:
@@ -127,14 +140,7 @@ def mirna_proximity(fi_cage, f_mirna, f_out):
                 l = l.split('\t')
                 strand = l[6]
 
-                if strand == '+':
-                    peak_start  = int(l[3])
-                    mirna_start = int(l[12])
-                    d = mirna_start - peak_start
-                else:
-                    peak_stop  = int(l[4])
-                    mirna_stop = int(l[13])
-                    d = peak_stop - mirna_stop
+                d = calculate_distance(l[3], l[4], l[12], l[13], strand)
 
                 out.write( _make_newline(l, d) + '\n')
 
