@@ -184,7 +184,7 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
     cage_index    = _index_tcnorm(f_ids)
     correlation._get_sample_pairings(cage_index, srnaseq_index, pair_sample)
 
-    ## correlation:
+    ## compute correlation:
     correlation._compute_correlation(pair_pos, pair_sample,
                                      f_rle, m_mirna,
                                      fo_corr, corrmethod, '.')
@@ -193,7 +193,7 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
 
 
     ## PART3: compute features
-    ## cpg, cons, tata ...
+    ## compute cpg, cons, tata ...
     outdir_seqfeatures = os.path.join(outdir, 'seqfeatures/')
     ensure_dir(outdir_seqfeatures)
 
@@ -207,13 +207,14 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
     gff_1kbfeatures = os.path.join(outdir_seqfeatures, 'features_1kbseq.gff')
 
     _reformat_tss_to_1kb(gff_infile, gff1kb_infile)
+
     features.main(gff1kb_infile, outdir_seqfeatures,
                   f_fasta, f_chromsizes, d_phastcons, TRAP, f_psemmatrix,
                   gff_1kbfeatures)
 
     features_index = _index_1kbfeatures(gff_1kbfeatures)
 
-
+    ## start consolidating features ...
     gff_allfeatures = os.path.join(outdir, 'features.gff')
     with open(gff_allfeatures, 'w') as out:
         with open(gff_infile) as f:
@@ -226,19 +227,19 @@ def extractFeatures_given_posPairs(config, gff_infile, outdir):
 
                 for n in pairid_index[pairid]:
 
-                    ## extract feature: correlation (corr)
+                    ## feature: correlation (corr)
                     cline =  linecache.getline(fo_corr, n).strip().split('\t')
                     corr  = cline[5]
                     cinfo = cline[8].split(';')
 
-                    ## extract feature: mirna (mprox)
+                    ## feature: mirna (mprox)
                     mstart = int(get_value_from_keycolonvalue_list('mirna_start', cinfo))
                     mstop = int(get_value_from_keycolonvalue_list('mirna_stop', cinfo))
 
                     d = mirna_proximity.calculate_distance(start, stop, mstart, mstop, strand)
                     mprox = str(mirna_proximity.distance_score(d))
 
-                    ## extract features: cpg, cons, tata (cct)
+                    ## features: cpg, cons, tata (cct)
                     for t in features_index[tssid]:
                         fline = linecache.getline(gff_1kbfeatures, t).strip().split('\t')
                         cct = fline[7]
