@@ -113,7 +113,7 @@ def _reformat_tss_to_1kb(gff_infile, gff1kb_infile):
 
                 newline = '\t'.join([chrom, '.', '.',
                                      str(mid - 500),
-                                     str(mid  + 500),
+                                     str(mid + 500),
                                      '.', strand, '.', newinfo])
                 out.write(newline + '\n')
     return
