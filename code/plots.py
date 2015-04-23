@@ -5,6 +5,8 @@ import argparse
 import re
 import os
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 from utils import get_value_from_keycolonvalue_list, ensure_dir
 
 usage = """
@@ -58,6 +60,22 @@ def _read_dat(gff_infile):
     dat.columns = ['tss', 'mirna', 'label', 'distance', 'correlation']
     return dat
 
+def _plt_pie(dat, title, pdf, rm_na=False, col="label"):
+    x = dat[col]
+    if rm_na: x = x[x != 'NA']
+    x = x.value_counts()
+
+    plt.figure()
+    plt.pie(x,
+            labels = x.index,
+            autopct='%1.1f%%',
+            startangle=90)
+    plt.text(-1,-1, '[Total = %s]' % sum(x))
+    plt.axis('equal')
+    plt.title(title)
+    pdf.savefig()
+    plt.close()
+    return
 
 def main(infile, outdir):
     outdir = os.path.abspath(outdir)
@@ -65,8 +83,11 @@ def main(infile, outdir):
 
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
     dat = _read_dat(infile)
-    print dat
 
+    pdf_outfile = 'test.pdf'
+    with PdfPages(pdf_outfile) as pdf:
+        _plt_pie(dat, 'All TSS-[miRNA,NA] pairs', pdf)
+        _plt_pie(dat, 'All valid TSS-miRNA pairs', pdf, True)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
