@@ -116,11 +116,12 @@ def _index_corr_pairid(gff_corr):
 
     return pairid_index
 
-def _reformat_tss_to_1kb(gff_infile, gff1kb_infile):
+def _reformat_tss_to_1kb(posfile, gff1kb_infile):
     with open(gff1kb_infile, 'w') as out:
-        with open(gff_infile) as f:
+        with open(posfile) as f:
             for l in f:
-                chrom, _, _, start, stop, _, strand, _, _ = l.strip().split()
+                l = l.strip().split('\t')[0]
+                _, chrom, start, _, stop, strand = re.split('[r:.,]', l)
 
                 newinfo = ';'.join(['start:' + start,
                                     'stop:'  + stop])
@@ -234,7 +235,7 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
     gff1kb_infile   = os.path.join(outdir_seqfeatures, 'infile_1kbseq.gff')
     gff_1kbfeatures = os.path.join(outdir_seqfeatures, 'features_1kbseq.gff')
 
-    _reformat_tss_to_1kb(gff_infile, gff1kb_infile)
+    _reformat_tss_to_1kb(f1_pos, gff1kb_infile)
 
     features.main(gff1kb_infile, outdir_seqfeatures,
                   f_fasta, f_chromsizes, d_phastcons, TRAP, f_psemmatrix,
