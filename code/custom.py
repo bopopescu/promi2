@@ -22,6 +22,8 @@ usage = """
 def _reformat_infile_gff2tcnorm(infile, outfile):
     with open(outfile, 'w') as out:
         with open(infile) as f:
+
+            oldline = ''
             for l in f:
                 l = l.strip().split('\t')
                 chrom = l[0]
@@ -30,7 +32,10 @@ def _reformat_infile_gff2tcnorm(infile, outfile):
                 strand = l[6]
 
                 newline = 'chr%s:%s..%s,%s' % (chrom, start, stop, strand)
-                out.write(newline + '\n')
+
+                if newline != oldline:
+                    out.write(newline + '\n')
+                    oldline = newline
     return
 
 def _index_tcnorm(f_ids):
@@ -152,6 +157,8 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
 
     ## 1b. reformat infile so that can be read by tc-quantify
     _reformat_infile_gff2tcnorm(gff_infile, f1_pos)
+    print f1_pos
+    sys.exit()
 
     ## 1c. run
     fo_bed = tc_normalization.main(tc_config, f1_pos, outdir_tc)
