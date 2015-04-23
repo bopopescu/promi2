@@ -22,6 +22,8 @@ usage = """
 def _reformat_infile_gff2tcnorm(infile, outfile):
     with open(outfile, 'w') as out:
         with open(infile) as f:
+
+            oldline = ''
             for l in f:
                 l = l.strip().split('\t')
                 chrom = l[0]
@@ -30,7 +32,10 @@ def _reformat_infile_gff2tcnorm(infile, outfile):
                 strand = l[6]
 
                 newline = 'chr%s:%s..%s,%s' % (chrom, start, stop, strand)
-                out.write(newline + '\n')
+
+                if newline != oldline:
+                    out.write(newline + '\n')
+                    oldline = newline
     return
 
 def _index_tcnorm(f_ids):
