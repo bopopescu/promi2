@@ -49,9 +49,10 @@ def _read_dat(gff_infile):
             label = get_value_from_keycolonvalue_list('mirna_label', info)
             if label == '': label = 'NA'
 
+
             features = l[7].split(';')
             corr = get_value_from_keycolonvalue_list('corr', features)
-            if get_value_from_keycolonvalue_list('mirna_prox', features) != '0':
+            if get_value_from_keycolonvalue_list('mirna_prox', features) != 0:
                 distance = get_value_from_keycolonvalue_list('distance', info)
 
             dat[n] = [tss, mirna, label, distance, corr]
