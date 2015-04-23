@@ -2,7 +2,9 @@
 # Author:  csiu
 # Created:
 import argparse
+import re
 import os
+import pandas as pd
 from utils import get_value_from_keycolonvalue_list, ensure_dir
 
 usage = """
@@ -26,17 +28,42 @@ def _filterPredictionsByClass_reformat2gff(infile, outdir, keep='prom'):
                     out.write(newline + '\n')
     return outfile
 
-def _read_data(gff_infile):
+def _read_allpairs(gff_infile):
+    dat = {}
+    n = 0
     with open(gff_infile) as f:
         for l in f:
-            pass
-    pass
+            n += 1
+
+            l = l.strip().split('\t')
+            chrom = l[0]
+            tstart = l[3]
+            tstop  = l[4]
+            strand = l[6]
+            tss = ','.join([chrom, tstart, tstop, strand])
+
+            info     = l[8].split(';')
+            mirna = get_value_from_keycolonvalue_list('mirbase_id', info)
+
+            features = l[7].split(';')
+            corr = get_value_from_keycolonvalue_list('corr', features)
+            if get_value_from_keycolonvalue_list('mirna_prox', features) != '0':
+                distance = get_value_from_keycolonvalue_list('distance', info)
+
+            dat[n] = [tss, mirna, distance, corr]
+
+    dat = pd.DataFrame.from_dict(dat, orient='index')
+    dat.columns = ['tss', 'mirna', 'distance', 'correlation']
+    return dat
 
 def main(infile, outdir):
     outdir = os.path.abspath(outdir)
     ensure_dir(outdir)
 
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
+    dat_all_pairs = _read_allpairs(infile)
+    print dat_all_pairs
+    print infile
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
