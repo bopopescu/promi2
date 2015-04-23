@@ -3,15 +3,16 @@
 # Created: 2015-04-22
 import argparse
 from utils import get_value_from_keycolonvalue_list, ensure_dir
+import re
 
 usage = """
 - Add intragenic/intergenic label info for mirna
 """
-def _labelfile2dict(labelfile):
+def _labelfile2dict_matchPos(labelfile):
     label_dict = {}
     with open(labelfile) as f:
         for l in f:
-            l = l.split()
+            l = l.split('\t')
             chrom  = l[0]
             start  = l[3]
             stop   = l[4]
@@ -20,8 +21,20 @@ def _labelfile2dict(labelfile):
             label_dict[','.join([chrom,start,stop,strand])] = label
     return label_dict
 
+def _labelfile2dict_matchMirna(labelfile):
+    label_dict = {}
+    with open(labelfile) as f:
+        for l in f:
+            l = l.split('\t')
+            label = l[5]
+
+            mirna = l[1].lower()
+            mirna = re.match('^(\w*-\w*-\d*)', mirna).group(1)
+            label_dict[mirna] = label
+    return label_dict
+
 def main(infile, labelfile, outfile):
-    label_dict = _labelfile2dict(labelfile)
+    label_dict = _labelfile2dict_matchMirna(labelfile)
 
     with open(outfile, 'w') as out:
         with open(infile) as f:
@@ -31,14 +44,17 @@ def main(infile, labelfile, outfile):
                 strand = line[6]
 
                 info   = line[8].strip(';').split(';')
+
                 mstart = get_value_from_keycolonvalue_list('mirna_start', info)
                 mstop  = get_value_from_keycolonvalue_list('mirna_stop', info)
 
-                mirna = ','.join([chrom,mstart,mstop,strand])
+                #mirna = ','.join([chrom,mstart,mstop,strand])
 
                 if mstart == '' and mstop == '':
                     label = 'NA'
                 else:
+                    mirna = get_value_from_keycolonvalue_list('mirbase_id', info)
+                    mirna = re.match('^(\w*-\w*-\d*)', mirna).group(1)
                     if label_dict.has_key(mirna):
                         label = label_dict[mirna]
                     else:
