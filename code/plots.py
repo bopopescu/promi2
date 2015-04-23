@@ -2,19 +2,41 @@
 # Author:  csiu
 # Created:
 import argparse
+import os
 from utils import get_value_from_keycolonvalue_list, ensure_dir
 
 usage = """
 """
-def _filter_predictions(infile, outdir, keep='prom'):
-    pass
+def _filterPredictionsByClass_reformat2gff(infile, outdir, keep='prom'):
+    outfile = os.path.join(outdir, os.path.basename(infile)+'.filtered')
+    with open(outfile, 'w') as out:
+        with open(infile) as f:
+            for l in f:
+                l = l.strip().split('\t')
+                classlabel = l[13]
 
-def _read_data(somefile):
+                if classlabel == keep:
+                    newinfo = ';'.join([l[8],
+                                        'prior_prom:' + l[9],
+                                        'prior_back:' + l[10],
+                                        'prob_prom:' + l[11],
+                                        'prob_back:' + l[12],
+                                        'class:' + classlabel])
+                    newline = '\t'.join(l[0:8] + [newinfo])
+                    out.write(newline + '\n')
+    return outfile
+
+def _read_data(gff_infile):
+    with open(gff_infile) as f:
+        for l in f:
+            pass
     pass
 
 def main(infile, outdir):
-    print outdir
-    pass
+    outdir = os.path.abspath(outdir)
+    ensure_dir(outdir)
+
+    infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
