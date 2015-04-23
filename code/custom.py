@@ -21,9 +21,9 @@ usage = """
 """
 def _reformat_infile_gff2tcnorm(infile, outfile):
     with open(outfile, 'w') as out:
+        pos = []
         with open(infile) as f:
-
-            oldline = ''
+            oldtss = ''
             for l in f:
                 l = l.strip().split('\t')
                 chrom = l[0]
@@ -31,11 +31,16 @@ def _reformat_infile_gff2tcnorm(infile, outfile):
                 stop  = l[4]
                 strand = l[6]
 
-                newline = 'chr%s:%s..%s,%s' % (chrom, start, stop, strand)
+                tss = 'chr%s:%s..%s,%s' % (chrom, start, stop, strand)
 
-                if newline != oldline:
-                    out.write(newline + '\n')
-                    oldline = newline
+                ## crude way to remove duplicate entries
+                if tss != oldtss:
+                    pos.append(tss)
+                    oldtss = tss
+
+        ## finer way to remove duplicate entries
+        for newline in list(set(pos)):
+            out.write(newline + '\n')
     return
 
 def _index_tcnorm(f_ids):
@@ -49,7 +54,7 @@ def _index_tcnorm(f_ids):
             tc_index[tc_id] = ['%s:%s' % (tc_id, c)]
     return tc_index
 
-def _interpret_tss_mirna_pairings(gff_infile, gff_mirna, pair_pos):
+def _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos):
     mirna_lookup = {}
     with open(gff_mirna) as f:
         for l in f:
@@ -64,14 +69,20 @@ def _interpret_tss_mirna_pairings(gff_infile, gff_mirna, pair_pos):
             mirna_lookup[srnaseqid] = [r, mirna_annot]
     mirna_lookup_keys =  mirna_lookup.keys()
 
+    tss_lookup = {}
+    with open(gff_tss) as f:
+        for l in f:
+            chrom, _, _, start, stop, _, strand, r, _ = l.split('\t')
+            tss = 'chr%s:%s..%s,%s' % (chrom, start, stop, strand)
+            tss_lookup[tss] = r
+
     with open(pair_pos, 'w') as out:
         with open(gff_infile) as f:
-            n = 0
             for l in f:
-                n += 1
-
                 chrom, _, _, start, stop, _, strand, _, mirna = l.strip().split('\t')
                 tss_annot = 'title=chr%s:%s..%s,%s' % (chrom, start, stop, strand)
+
+                n = tss_lookup['chr%s:%s..%s,%s' % (chrom, start, stop, strand)]
 
                 mirna = mirna.lower()
                 for k in [m for m in mirna_lookup_keys if re.match('%s(-.*$|$)' % mirna, m)]:
@@ -193,7 +204,7 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
     correlation._find_miRNA_pos(m_mirna, mirbase_gff2, gff_mirna)
     correlation._get_tss_pos(f1_pos, gff_tss)
     if has_mirna:
-        _interpret_tss_mirna_pairings(gff_infile, gff_mirna, pair_pos)
+        _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos)
     else:
         correlation._get_tss_mirna_pairings(gff_tss, gff_mirna, pair_pos)
 
