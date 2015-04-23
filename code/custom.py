@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Author:  csiu
-# Created:
+# Created: 2015-04-22
 import argparse
 from ConfigParser import SafeConfigParser
 import sys
