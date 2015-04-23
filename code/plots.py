@@ -49,7 +49,6 @@ def _read_dat(gff_infile):
             label = get_value_from_keycolonvalue_list('mirna_label', info)
             if label == '': label = 'NA'
 
-
             features = l[7].split(';')
             corr = get_value_from_keycolonvalue_list('corr', features)
             if get_value_from_keycolonvalue_list('mirna_prox', features) != 0:
@@ -61,7 +60,7 @@ def _read_dat(gff_infile):
     dat.columns = ['tss', 'mirna', 'label', 'distance', 'correlation']
     return dat
 
-def _plt_pie(dat, title, pdf, rm_na=False, col="label"):
+def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
     x = dat[col]
     if rm_na: x = x[x != 'NA']
     x = x.value_counts()
@@ -78,6 +77,9 @@ def _plt_pie(dat, title, pdf, rm_na=False, col="label"):
     plt.close()
     return
 
+def _plt_countditr(dat, pdf, col, title='', rm_na=False):
+    pass
+
 def main(infile, outdir):
     outdir = os.path.abspath(outdir)
     ensure_dir(outdir)
@@ -87,8 +89,8 @@ def main(infile, outdir):
 
     pdf_outfile = 'test.pdf'
     with PdfPages(pdf_outfile) as pdf:
-        _plt_pie(dat, 'All TSS-[miRNA,NA] pairs', pdf)
-        _plt_pie(dat, 'All valid TSS-miRNA pairs', pdf, True)
+        _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
+        _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
