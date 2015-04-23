@@ -6,11 +6,14 @@ from utils import get_value_from_keycolonvalue_list, ensure_dir
 
 usage = """
 """
-def read_data(somefile):
+def _filter_predictions(infile, outdir, keep='prom'):
     pass
 
-def main(infile, outfile):
-    print outfile
+def _read_data(somefile):
+    pass
+
+def main(infile, outdir):
+    print outdir
     pass
 
 if __name__ == '__main__':
@@ -21,16 +24,12 @@ if __name__ == '__main__':
                         required=True,
                         help='''path to input file''')
 
-    parser.add_argument('-o', '--outfile', dest='outfile',
-                        help='''specify path to output file''')
+    parser.add_argument('-o', '--outdir', dest='outdir',
+                        default='.',
+                        help='''specify path to output directory''')
 
     ##get at the arguments
     args = parser.parse_args()
 
-    if args.outfile == None:
-        outfile = '%s.plt' % args.infile
-    else:
-        outfile = args.outfile
-
     ## do something..
-    main(args.infile, outfile)
+    main(args.infile, args.outdir)
