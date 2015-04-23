@@ -157,8 +157,6 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
 
     ## 1b. reformat infile so that can be read by tc-quantify
     _reformat_infile_gff2tcnorm(gff_infile, f1_pos)
-    print f1_pos
-    sys.exit()
 
     ## 1c. run
     fo_bed = tc_normalization.main(tc_config, f1_pos, outdir_tc)
