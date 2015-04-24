@@ -278,7 +278,7 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                         d = mirna_proximity.calculate_distance(start, stop, mstart, mstop, strand)
                         mprox = str(mirna_proximity.distance_score(d))
 
-                        mirna_info = ';'.join([';'.join(cinfo[:-1]),
+                        mirna_info = ';'.join([';'.join(cinfo),
                                                'distance:'+str(d),
                                                'corrmethod:'+corrmethod])
                         mirna_partner.append([corr, mprox, mirna_info])
