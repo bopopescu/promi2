@@ -226,9 +226,16 @@ def main(infile, outdir):
     with PdfPages(pdf_pie) as pdf:
         _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
         _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
+        _plt_pie(dat_mirna, pdf, 'Distinct miRNA')
+        _plt_pie(dat_tss, pdf, 'Distinct TSS (label from closest miRNA)')
+
     _plt_distr(dat, pdf_distr_dist, 'distance',    'All valid tss-miRNA pairs')
     _plt_distr(dat, pdf_distr_corr, 'correlation', 'All valid tss-miRNA pairs')
     _plt_percountr(dat, pdf_per)
+    _plt_distr(dat_mirna, pdf_distr_dist+'.mirna.pdf', 'distance',    'miRNA to closest TSS')
+    _plt_distr(dat_mirna, pdf_distr_corr+'.mirna.pdf', 'correlation', 'miRNA to closest TSS')
+    _plt_distr(dat_tss, pdf_distr_dist+'.tss.pdf', 'distance',    'TSS to closest miRNA')
+    _plt_distr(dat_tss, pdf_distr_corr+'.tss.pdf', 'correlation', 'TSS to closest miRNA')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
