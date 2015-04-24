@@ -78,7 +78,7 @@ def _tss_findClosest_mirna(dat):
 def _mirna_findClosest_tss(dat):
     pass
 
-def _plt_percount(dat, fname):
+def _plt_percountr(dat, fname):
     def _filt_dat(dat, item, getlabel=True):
         df = pd.DataFrame(dat[item].value_counts())
         df.columns = ['count']
@@ -208,14 +208,14 @@ def main(infile, outdir):
     pdf_outfile = 'xtest.pdf'
     pdf_outfile_distr_dist = 'xdistance.pdf'
     pdf_outfile_distr_corr = 'xcorrelation.pdf'
+    pdf_outfile_per = 'xper.pdf'
 
-    _plt_percount(dat, 'xper.pdf')
-    sys.exit()
     with PdfPages(pdf_outfile) as pdf:
         _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
         _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
     _plt_distr(dat, pdf_outfile_distr_dist, 'distance',    'All valid tss-miRNA pairs')
     _plt_distr(dat, pdf_outfile_distr_corr, 'correlation', 'All valid tss-miRNA pairs')
+    _plt_percountr(dat, pdf_outfile_per)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
