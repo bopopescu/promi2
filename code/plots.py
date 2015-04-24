@@ -72,11 +72,22 @@ def _read_dat(gff_infile):
     dat.columns = ['tss', 'mirna', 'mirna_id', 'label', 'distance', 'correlation']
     return dat
 
-def _tss_findClosest_mirna(dat):
-    pass
+def _item_findClosestPartner(dat, item):
+    df = dat[dat['label'] != 'NA'] ## remove invalid pairs
 
-def _mirna_findClosest_tss(dat):
-    pass
+    xindex = []
+    for i in df[item].unique():
+        subm = df[df[item] == i]
+
+        ## min distance
+        submd = subm[subm['distance'] == subm['distance'].min()]
+
+        ## absmax correlation
+        l = submd['correlation'].astype(float).abs()
+        l = l[l == l.max()]
+
+        xindex.append(l.index[0])
+    return dat[dat.index.isin(xindex)]
 
 def _plt_percountr(dat, fname):
     def _filt_dat(dat, item, getlabel=True):
@@ -203,6 +214,8 @@ def main(infile, outdir):
 
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
     dat = _read_dat(infile)
+    dat_mirna = _item_findClosestPartner(dat, 'mirna')
+    dat_tss   = _item_findClosestPartner(dat, 'tss')
 
     ## FIXME
     pdf_outfile = 'xtest.pdf'
