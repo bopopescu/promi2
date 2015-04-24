@@ -95,8 +95,8 @@ def _plt_percount(dat, fname):
     df = robjects.DataFrame(df)
 
     pt = ggplot2.ggplot(df) + \
-        ggplot2.geom_histogram(binwidth=1, origin = -0.5, alpha=.5, position="identity") + \
-        ggplot2.xlim(-0.5, mx+1) + \
+        ggplot2.geom_histogram(binwidth=1, origin=-.5, alpha=.5, position="identity") + \
+        ggplot2.xlim(-.5, mx+1) + \
         ggplot2.aes_string(x='count') + \
         ggplot2.ggtitle('TSS [Total = %s]' % n) + \
         ggplot2.labs(x='Number of miRNA per TSS (max = %s)' % mx)
@@ -115,8 +115,8 @@ def _plt_percount(dat, fname):
     df = robjects.DataFrame(df)
 
     pm = ggplot2.ggplot(df) + \
-        ggplot2.geom_histogram(binwidth=1, origin = -0.5, alpha=.5, position="identity") + \
-        ggplot2.xlim(-0.5, mx+1) + \
+        ggplot2.geom_histogram(binwidth=1, origin=-.5, alpha=.5, position="identity") + \
+        ggplot2.xlim(-.5, mx+1) + \
         ggplot2.aes_string(x='count', fill='label') + \
         ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
         ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
