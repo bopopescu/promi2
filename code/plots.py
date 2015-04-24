@@ -211,25 +211,24 @@ def _plt_distr(dat, fname, col, title='', pfill='label'):
 
 def main(infile, outdir):
     outdir = os.path.abspath(outdir)
-    ensure_dir(outdir)
+    ensure_dir(outdir, False)
 
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
     dat = _read_dat(infile)
     dat_mirna = _item_findClosestPartner(dat, 'mirna')
     dat_tss   = _item_findClosestPartner(dat, 'tss')
 
-    ## FIXME
-    pdf_outfile = 'xtest.pdf'
-    pdf_outfile_distr_dist = 'xdistance.pdf'
-    pdf_outfile_distr_corr = 'xcorrelation.pdf'
-    pdf_outfile_per = 'xper.pdf'
+    pdf_pie = os.path.join(outdir, 'xpie.pdf')
+    pdf_distr_dist = os.path.join(outdir, 'xdistance.pdf')
+    pdf_distr_corr = os.path.join(outdir, 'xcorrelation.pdf')
+    pdf_per = os.path.join(outdir, 'xper.pdf')
 
-    with PdfPages(pdf_outfile) as pdf:
+    with PdfPages(pdf_pie) as pdf:
         _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
         _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
-    _plt_distr(dat, pdf_outfile_distr_dist, 'distance',    'All valid tss-miRNA pairs')
-    _plt_distr(dat, pdf_outfile_distr_corr, 'correlation', 'All valid tss-miRNA pairs')
-    _plt_percountr(dat, pdf_outfile_per)
+    _plt_distr(dat, pdf_distr_dist, 'distance',    'All valid tss-miRNA pairs')
+    _plt_distr(dat, pdf_distr_corr, 'correlation', 'All valid tss-miRNA pairs')
+    _plt_percountr(dat, pdf_per)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
@@ -240,7 +239,7 @@ if __name__ == '__main__':
                         help='''path to input file''')
 
     parser.add_argument('-o', '--outdir', dest='outdir',
-                        default='.',
+                        default='../Testout-plot',
                         help='''specify path to output directory''')
 
     ##get at the arguments
