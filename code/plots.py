@@ -53,20 +53,30 @@ def _read_dat(gff_infile):
             tss = ','.join([chrom, tstart, tstop, strand])
 
             info  = l[8].split(';')
-            mirna = get_value_from_keycolonvalue_list('mirbase_id', info)
+            mirna_id = get_value_from_keycolonvalue_list('mirbase_id', info)
+            mstart = get_value_from_keycolonvalue_list('mirna_start', info)
+            mstop  = get_value_from_keycolonvalue_list('mirna_start', info)
             label = get_value_from_keycolonvalue_list('mirna_label', info)
+
             if label == '': label = 'NA'
+            mirna = ','.join([chrom, mstart, mstop, strand])
 
             features = l[7].split(';')
             corr = get_value_from_keycolonvalue_list('corr', features)
             if get_value_from_keycolonvalue_list('mirna_prox', features) != 0:
                 distance = get_value_from_keycolonvalue_list('distance', info)
 
-            dat[n] = [tss, mirna, label, distance, corr]
+            dat[n] = [tss, mirna, mirna_id, label, distance, corr]
 
     dat = pd.DataFrame.from_dict(dat, orient='index')
-    dat.columns = ['tss', 'mirna', 'label', 'distance', 'correlation']
+    dat.columns = ['tss', 'mirna', 'mirna_id', 'label', 'distance', 'correlation']
     return dat
+
+def _tss_findClosest_mirna(dat):
+    pass
+
+def _mirna_findClosest_tss(dat):
+    pass
 
 def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
     x = dat[col]
