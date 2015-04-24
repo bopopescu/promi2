@@ -85,7 +85,7 @@ def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
     plt.close()
     return
 
-def _plt_countdistr(dat, fname, col, title='', pfill='label'):
+def _plt_distr(dat, fname, col, title='', pfill='label'):
     df = dat[dat[pfill] != 'NA'] ## remove invalid pairs
     df = {col: robjects.FloatVector(list(df[col])),
           pfill: robjects.StrVector(list(df[pfill]))}
@@ -95,44 +95,34 @@ def _plt_countdistr(dat, fname, col, title='', pfill='label'):
     grdevices.pdf(file=fname)
 
     pp = ggplot2.ggplot(df) + \
-        ggplot2.aes_string(x=col, fill=pfill) + \
         ggplot2.ggtitle(title)
 
+    ## Plot1: counts
+    p1 = pp + ggplot2.aes_string(x=col, fill=pfill)
+
+    ## Plot2: density
+    p2 = pp + \
+        ggplot2.aes_string(x=col, fill=pfill, y='..density..') + \
+        ggplot2.geom_density(alpha=.5, origin=-500)
+
+
     if col == 'distance':
-        pp = pp + \
+        p1 = p1 + \
             ggplot2.geom_histogram(binwidth=1000, alpha=.5, position='identity', origin=-500) + \
             ggplot2.xlim(-1000, 51000)
-    else:
-        pp = pp + \
-            ggplot2.geom_histogram(alpha=.5, position='identity')
 
-    pp.plot()
-    grdevices.dev_off()
-    return
-
-def _plt_dendistr(dat, fname, col, title='', pfill='label'):
-    df = dat[dat[pfill] != 'NA'] ## remove invalid pairs
-    df = {col: robjects.FloatVector(list(df[col])),
-          pfill: robjects.StrVector(list(df[pfill]))}
-    df = robjects.DataFrame(df)
-
-    grdevices = importr('grDevices')
-    grdevices.pdf(file=fname)
-
-    pp = ggplot2.ggplot(df) + \
-        ggplot2.aes_string(x=col, fill=pfill, y='..density..') + \
-        ggplot2.geom_density(alpha=.5, origin=-500) + \
-        ggplot2.ggtitle(title)
-
-    if col == 'distance':
-        pp = pp + \
+        p2 = p2 + \
             ggplot2.geom_histogram(binwidth=1000, alpha=.33, position='identity', origin=-500) + \
             ggplot2.xlim(-1000, 51000)
     else:
-        pp = pp + \
+        p1 = p1 + \
+            ggplot2.geom_histogram(alpha=.5, position='identity')
+
+        p2 = p2 + \
             ggplot2.geom_histogram(alpha=.33, position='identity')
 
-    pp.plot()
+    p1.plot()
+    p2.plot()
     grdevices.dev_off()
     return
 
@@ -147,16 +137,12 @@ def main(infile, outdir):
     pdf_outfile = 'test.df'
     pdf_outfile_distr_dist = 'xdistance.pdf'
     pdf_outfile_distr_corr = 'xcorrelation.pdf'
-    pdf_outfile_distr_ddist = 'xdistanceden.pdf'
-    pdf_outfile_distr_dcorr = 'xcorrelationden.pdf'
 
     with PdfPages(pdf_outfile) as pdf:
         _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
         _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
-    _plt_countdistr(dat, pdf_outfile_distr_dist, 'distance',    'All valid tss-miRNA pairs')
-    _plt_dendistr(dat, pdf_outfile_distr_ddist,  'distance',    'All valid tss-miRNA pairs')
-    _plt_countdistr(dat, pdf_outfile_distr_corr, 'correlation', 'All valid tss-miRNA pairs')
-    _plt_dendistr(dat, pdf_outfile_distr_dcorr,  'correlation', 'All valid tss-miRNA pairs')
+    _plt_distr(dat, pdf_outfile_distr_dist, 'distance',    'All valid tss-miRNA pairs')
+    _plt_distr(dat, pdf_outfile_distr_corr, 'correlation', 'All valid tss-miRNA pairs')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
