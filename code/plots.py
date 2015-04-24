@@ -65,11 +65,12 @@ def _read_dat(gff_infile):
             corr = get_value_from_keycolonvalue_list('corr', features)
             if get_value_from_keycolonvalue_list('mirna_prox', features) != 0:
                 distance = get_value_from_keycolonvalue_list('distance', info)
+                if distance == '': distance = 0
 
-            dat[n] = [tss, mirna, mirna_id, label, distance, corr]
+            dat[n] = [tss, mirna, mirna_id, label, distance, abs(float(distance)), corr]
 
     dat = pd.DataFrame.from_dict(dat, orient='index')
-    dat.columns = ['tss', 'mirna', 'mirna_id', 'label', 'distance', 'correlation']
+    dat.columns = ['tss', 'mirna', 'mirna_id', 'label', 'Distance', 'distance', 'correlation']
     return dat
 
 def _item_findClosestPartner(dat, item):
