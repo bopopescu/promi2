@@ -78,6 +78,66 @@ def _tss_findClosest_mirna(dat):
 def _mirna_findClosest_tss(dat):
     pass
 
+def _plt_percount(dat, fname):
+    def _filt_dat(dat, item, getlabel=True):
+        df = pd.DataFrame(dat[item].value_counts())
+        df.columns = ['count']
+        if getlabel: df['label'] = [list(dat[dat[item] == i]['label'])[0] for i in df.index]
+        n  = len(df)
+        mx = max(df['count'])
+        return df, n, mx
+
+    dat = dat[dat['label'] != 'NA']
+
+    ## NUMBER OF MIRNA PER TSS
+    df, n, mx = _filt_dat(dat, 'tss', False)
+    df = {'count': robjects.IntVector(df['count'])}
+    df = robjects.DataFrame(df)
+
+    pt = ggplot2.ggplot(df) + \
+        ggplot2.geom_histogram(binwidth=1, origin = -0.5, alpha=.5, position="identity") + \
+        ggplot2.xlim(-0.5, mx+1) + \
+        ggplot2.aes_string(x='count') + \
+        ggplot2.ggtitle('TSS [Total = %s]' % n) + \
+        ggplot2.labs(x='Number of miRNA per TSS (max = %s)' % mx)
+
+    pt_den = ggplot2.ggplot(df) + \
+        ggplot2.aes_string(x='count', y='..density..') + \
+        ggplot2.geom_density(binwidth=1, alpha=.5, origin=-.5) + \
+        ggplot2.geom_histogram(binwidth=1, alpha=.33, position='identity', origin=-.5) + \
+        ggplot2.ggtitle('TSS [Total = %s]' % n) + \
+        ggplot2.labs(x='Number of miRNA per TSS (max = %s)' % mx)
+
+    ## NUMBER OF TSS PER MIRNA
+    df, n, mx = _filt_dat(dat, 'mirna')
+    df = {'count': robjects.IntVector(df['count']),
+          'label': robjects.StrVector(df['label']) }
+    df = robjects.DataFrame(df)
+
+    pm = ggplot2.ggplot(df) + \
+        ggplot2.geom_histogram(binwidth=1, origin = -0.5, alpha=.5, position="identity") + \
+        ggplot2.xlim(-0.5, mx+1) + \
+        ggplot2.aes_string(x='count', fill='label') + \
+        ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
+        ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
+
+    pm_den = ggplot2.ggplot(df) + \
+        ggplot2.aes_string(x='count', fill='label', y='..density..') + \
+        ggplot2.geom_density(binwidth=1, alpha=.5, origin=-.5) + \
+        ggplot2.geom_histogram(binwidth=1, alpha=.33, position='identity', origin=-.5) + \
+        ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
+        ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
+
+
+    grdevices = importr('grDevices')
+    grdevices.pdf(fname)
+    pt.plot()
+    pt_den.plot()
+    pm.plot()
+    pm_den.plot()
+    grdevices.dev_off()
+
+
 def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
     x = dat[col]
     if rm_na: x = x[x != 'NA']
@@ -149,6 +209,8 @@ def main(infile, outdir):
     pdf_outfile_distr_dist = 'xdistance.pdf'
     pdf_outfile_distr_corr = 'xcorrelation.pdf'
 
+    _plt_percount(dat, 'xper.pdf')
+    sys.exit()
     with PdfPages(pdf_outfile) as pdf:
         _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
         _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
