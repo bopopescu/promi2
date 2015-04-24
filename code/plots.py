@@ -87,6 +87,7 @@ def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
 
 def _plt_distr(dat, fname, col, title='', pfill='label'):
     df = dat[dat[pfill] != 'NA'] ## remove invalid pairs
+    n  = len(df)
     df = {col: robjects.FloatVector(list(df[col])),
           pfill: robjects.StrVector(list(df[pfill]))}
     df = robjects.DataFrame(df)
@@ -95,7 +96,7 @@ def _plt_distr(dat, fname, col, title='', pfill='label'):
     grdevices.pdf(file=fname)
 
     pp = ggplot2.ggplot(df) + \
-        ggplot2.ggtitle(title)
+        ggplot2.ggtitle('%s [Total = %s]' % (title, n))
 
     ## Plot1: counts
     p1 = pp + ggplot2.aes_string(x=col, fill=pfill)
@@ -134,7 +135,7 @@ def main(infile, outdir):
     dat = _read_dat(infile)
 
     ## FIXME
-    pdf_outfile = 'test.df'
+    pdf_outfile = 'xtest.pdf'
     pdf_outfile_distr_dist = 'xdistance.pdf'
     pdf_outfile_distr_corr = 'xcorrelation.pdf'
 
