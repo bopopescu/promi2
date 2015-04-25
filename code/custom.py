@@ -14,6 +14,7 @@ import correlation
 import mirna_proximity
 import features
 import promi2
+import label
 
 usage = """
 - Given gff infile, extract cpg,cons,tata,mprox,corr features
@@ -326,6 +327,7 @@ def main(f_config, gff_infile, outdir, has_mirna):
     cparser.read(f_config)
     f_params       = cparser.get('promi2', 'params')
     listoffeatures = cparser.get('promi2', 'features').split(',')
+    labelfile = cparser.get('configs', 'labelfile')
 
     ## Extract features
     gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna)
@@ -335,7 +337,11 @@ def main(f_config, gff_infile, outdir, has_mirna):
                                   'Predictions.%s.txt' % os.path.basename(gff_infile))
     promi2.promi2(f_params, listoffeatures, gff_allfeatures, fo_predictions)
 
-    return fo_predictions
+    ## Label
+    fo_labelledpredictions = fo_predictions + '.label'
+    label.main(fo_predictions, labelfile, fo_labelledpredictions)
+
+    return fo_labelledpredictions
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
