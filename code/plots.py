@@ -222,12 +222,14 @@ def main(infile, outdir):
     ensure_dir(outdir, False)
 
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
+
+    bname = os.path.basename(infile)
+    pdf_pie    = os.path.join(outdir, bname + '.plotpie.pdf')
+    pdf_rplots = os.path.join(outdir, bname + '.plothist.pdf')
+
     dat = _read_dat(infile)
     dat_mirna = _item_findClosestPartner(dat, 'mirna')
     dat_tss   = _item_findClosestPartner(dat, 'tss')
-
-    pdf_pie    = os.path.join(outdir, 'xpie.pdf')
-    pdf_rplots = os.path.join(outdir, 'xhis.pdf')
 
     with PdfPages(pdf_pie) as pdf:
         _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
