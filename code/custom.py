@@ -97,7 +97,7 @@ def _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos):
                     out.write(newline + '\n')
     return
 
-def _index_corr_pairid(gff_corr, usemirna=True):
+def _index_corr_pairid(gff_corr, has_mirna):
     pairid_index = {}
     with open(gff_corr) as f:
         c = 0
@@ -108,11 +108,11 @@ def _index_corr_pairid(gff_corr, usemirna=True):
             info    = info.split(';')
 
             pid = '.'.join([chrom, start, stop, strand])
-            if usemirna:
+            if has_mirna:
                 mirna = get_value_from_keycolonvalue_list('mirna_query', info)
                 val = '%s:%s' % (mirna, c)
             else:
-                val = 'c'
+                val = c
 
             try:
                 pairid_index[pid].append(val)
@@ -224,7 +224,7 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                                      f_rle, m_mirna,
                                      fo_corr, corrmethod, '.')
 
-    pairid_index = _index_corr_pairid(fo_corr)
+    pairid_index = _index_corr_pairid(fo_corr, has_mirna)
 
     ## PART3: compute features
     ## compute cpg, cons, tata ...
@@ -271,6 +271,8 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                                 n = int(n)
                             else:
                                 continue
+                        else:
+                            n = cmirna
 
                         ## feature: correlation (corr)
                         cline =  linecache.getline(fo_corr, n).strip().split('\t')
