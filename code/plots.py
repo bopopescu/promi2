@@ -7,23 +7,20 @@ import os
 import sys
 import pandas as pd
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects.lib import ggplot2
+from rpy2.robjects import r
 
 from utils import get_value_from_keycolonvalue_list, ensure_dir
 
-usage = """Generate plots (pie + histogram) with matplotlib and R
+usage = """Generate plots (pie + histogram) with R via rpy2
 
 Note:
 - If this script is ran via SSH, enable "-X"
 
 Depends on:
 - pandas     (python module)
-- matplotlib (python module)
 - rpy2       (python module)
 - ggplot2    (R package)
 """
@@ -163,23 +160,6 @@ def _plt_percountr(dat, independentpdf=False, fname='xpercount.pdf'):
         pm_den.plot()
     return
 
-def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
-    x = dat[col]
-    if rm_na: x = x[x != 'NA']
-    x = x.value_counts()
-
-    plt.figure()
-    plt.pie(x,
-            labels = x.index,
-            autopct='%1.1f%%',
-            startangle=90)
-    plt.text(-1,-1, '[Total = %s]' % sum(x))
-    plt.axis('equal')
-    plt.title(title)
-    pdf.savefig()
-    plt.close()
-    return
-
 def _plt_distr(dat, col, title='', pfill='label', independentpdf=False, fname='xdistr.pdf'):
     df = dat[dat[pfill] != 'NA'] ## remove invalid pairs
     n  = len(df)
@@ -229,6 +209,44 @@ def _plt_distr(dat, col, title='', pfill='label', independentpdf=False, fname='x
         p2.plot()
     return
 
+def _plt_pier(dat, title='', rm_na=False, col='label',
+              independentpdf=False, fname='xpire.pdf'):
+    x = dat[col]
+    if rm_na: x = x[x != 'NA']
+    x = x.value_counts()
+    _sum = sum(x)
+
+    r.assign('n', len(x))
+
+    slices = robjects.FloatVector(x)
+    pct  = ['%0.1f%%' % float(float(i)*100/_sum) for i in x]
+    lbls = ['%s %s' % i  for i in zip(x.index, pct)]
+    lbls   = robjects.StrVector(lbls)
+
+    ggcolors = r('''
+      gg_color_hue <- function(n){
+            hues = seq(15, 375, length=n+1)
+            hcl(h=hues, l=65, c=100)[1:n]
+            }
+
+      rev(gg_color_hue(n))
+    ''')
+
+    if independentpdf:
+        grdevices = importr('grDevices')
+        grdevices.pdf(pdf)
+
+    r.pie(slices,
+          labels=lbls,
+          init_angle=90,
+          col=ggcolors,
+          main=title)
+    r.text(-1, -1, '[Total = %s]' % _sum)
+
+    if independentpdf:
+        grdevices.dev_off()
+    return
+
 def main(infile, outdir):
     outdir = os.path.abspath(outdir)
     ensure_dir(outdir, False)
@@ -236,32 +254,32 @@ def main(infile, outdir):
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
 
     bname = os.path.basename(infile)
-    pdf_pie    = os.path.join(outdir, bname + '.plotpie.pdf')
-    pdf_rplots = os.path.join(outdir, bname + '.plothist.pdf')
+    pdf_rplots = os.path.join(outdir, bname + '.plots.pdf')
 
     dat = _read_dat(infile)
     dat_mirna = _item_findClosestPartner(dat, 'mirna')
     dat_tss   = _item_findClosestPartner(dat, 'tss')
 
-    pdf = PdfPages(pdf_pie)
-    _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
-    _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
-    _plt_pie(dat_mirna, pdf, 'Distinct miRNA')
-    _plt_pie(dat_tss, pdf, 'Distinct TSS (label from closest miRNA)')
-    pdf.close()
-
     grdevices = importr('grDevices')
     grdevices.pdf(file=pdf_rplots)
 
-    _plt_percountr(dat)
+    _plt_pier(dat, 'All TSS-[miRNA,NA] pairs')
+    _plt_pier(dat, 'All valid TSS-miRNA pairs', True)
     _plt_distr(dat, 'distance',    'All valid tss-miRNA pairs')
     _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs')
+
+    _plt_percountr(dat)
+
+    _plt_pier(dat_tss,   'Distinct TSS (label from closest miRNA)')
     _plt_distr(dat_tss, 'distance',    'TSS to closest miRNA')
     _plt_distr(dat_tss, 'correlation', 'TSS to closest miRNA')
+
+    _plt_pier(dat_mirna, 'Distinct miRNA')
     _plt_distr(dat_mirna, 'distance',    'miRNA to closest TSS')
     _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
 
     grdevices.dev_off()
+    return pdf_rplots
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
