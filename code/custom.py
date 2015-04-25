@@ -320,7 +320,7 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
 
     return gff_allfeatures
 
-def main(f_config, gff_infile, outdir, has_mirna):
+def main(f_config, gff_infile, outdir, has_mirna, make_plots):
     ensure_dir(outdir)
 
     cparser = SafeConfigParser()
@@ -337,9 +337,15 @@ def main(f_config, gff_infile, outdir, has_mirna):
                                   'Predictions.%s.txt' % os.path.basename(gff_infile))
     promi2.promi2(f_params, listoffeatures, gff_allfeatures, fo_predictions)
 
-    ## Label
+    ## Label predictions
     fo_labelledpredictions = fo_predictions + '.label'
     label.main(fo_predictions, labelfile, fo_labelledpredictions)
+
+    ## Generate plots
+    if make_plots:
+        import plots
+        outdir_plt = os.path.join(outdir, 'plots')
+        plots.main(fo_labelledpredictions, outdir_plt)
 
     return fo_labelledpredictions
 
@@ -367,6 +373,14 @@ Tab-separated columns should be like:
                         help='''Flag to designate that INFILE has miRNA in column 9
 e.g. tss-mirna pairing is already provided &
 program does not need to look for pairs
+''')
+
+    parser.add_argument('-p', dest='make_plots',
+                        action='store_true',
+                        help='''Flag to enable plotting
+This requires extra packages to be pre-installed:
+- Python: pandas, matplotlib, rpy2
+- R: ggplot2
 
 ''')
 
@@ -381,4 +395,4 @@ program does not need to look for pairs
     args = parser.parse_args()
 
     ## do something..
-    main(args.f_config, args.infile, args.outdir, args.has_mirna)
+    main(args.f_config, args.infile, args.outdir, args.has_mirna, args.make_plots)
