@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Author:  csiu
-# Created:
+# Created: 2015-04-24
 import argparse
 import re
 import os
@@ -17,7 +17,7 @@ from rpy2.robjects.lib import ggplot2
 
 from utils import get_value_from_keycolonvalue_list, ensure_dir
 
-usage = """
+usage = """Generate plots (pie + histogram) with matplotlib and R
 """
 def _filterPredictionsByClass_reformat2gff(infile, outdir, keep='prom'):
     outfile = os.path.join(outdir, os.path.basename(infile)+'.filtered')
@@ -256,7 +256,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-i', '--infile', dest='infile',
                         required=True,
-                        help='''path to input file''')
+                        help='''path to input file;
+e.g. output of "label.py"''')
 
     parser.add_argument('-o', '--outdir', dest='outdir',
                         default='../Testout-plot',
