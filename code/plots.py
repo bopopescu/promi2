@@ -16,9 +16,6 @@ from utils import get_value_from_keycolonvalue_list, ensure_dir
 
 usage = """Generate plots (pie + histogram) with R via rpy2
 
-Note:
-- If this script is ran via SSH, enable "-X"
-
 Depends on:
 - pandas     (python module)
 - rpy2       (python module)
