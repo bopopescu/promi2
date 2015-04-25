@@ -91,12 +91,13 @@ def _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos):
                                                     re.sub('-[35]p$', '', k)])
 
                     newline = '\t'.join([tss_annot, str(n),
-                                         ','.join([mirna_annot, pairid]), r])
+                                         ','.join([mirna_annot, 'mirna_query='+mirna, pairid]),
+                                         r])
 
                     out.write(newline + '\n')
     return
 
-def _index_corr_pairid(gff_corr):
+def _index_corr_pairid(gff_corr, usemirna=True):
     pairid_index = {}
     with open(gff_corr) as f:
         c = 0
@@ -106,13 +107,17 @@ def _index_corr_pairid(gff_corr):
             chrom, _, _, start, stop, _, strand, _, info = l.strip().rsplit('\t')
             info    = info.split(';')
 
-            pid = get_value_from_keycolonvalue_list('pair_id', info)
-            if pid == '': pid = '.'.join([chrom, start, stop, strand])
+            pid = '.'.join([chrom, start, stop, strand])
+            if usemirna:
+                mirna = get_value_from_keycolonvalue_list('mirna_query', info)
+                val = '%s:%s' % (mirna, c)
+            else:
+                val = 'c'
 
             try:
-                pairid_index[pid].append(c)
+                pairid_index[pid].append(val)
             except KeyError:
-                pairid_index[pid] = [c]
+                pairid_index[pid] = [val]
 
     return pairid_index
 
@@ -254,17 +259,18 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                 ## setting ids...
                 tssid  = '.'.join([chrom, start, stop, strand])
 
-                if has_mirna:
-                    pairid = '.'.join([tssid, mirna])
-                else:
-                    pairid = tssid
-
                 ## getting info...
                 ncount = ncount_dict[tssid]
 
                 mirna_partner = []
-                if pairid_index.has_key(pairid):
-                    for n in pairid_index[pairid]:
+                if pairid_index.has_key(tssid):
+                    for cmirna in pairid_index[tssid]:
+                        if has_mirna:
+                            cmirna, n = cmirna.split(':')
+                            if mirna == cmirna:
+                                n = int(n)
+                            else:
+                                continue
 
                         ## feature: correlation (corr)
                         cline =  linecache.getline(fo_corr, n).strip().split('\t')
@@ -282,6 +288,9 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                                                'distance:'+str(d),
                                                'corrmethod:'+corrmethod])
                         mirna_partner.append([corr, mprox, mirna_info])
+
+                    #print '\t'.join(['>>', tssid] + pairid_index[tssid])
+
                 else:
                     mirna_partner.append(['0', '0', ''])
 
@@ -299,9 +308,9 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                                                 'mirna_prox:' + mprox,
                                                 'corr:'       + corr])
 
-                        newinfo = ';'.join([info_region, mirna_info])
+                        newinfo = ';'.join([info_region,  mirna_info])
 
-                        newline = '\t'.join([chrom, '.', '.',
+                        newline = '\t'.join([chrom, '.', mirna,
                                              start, stop, ncount,
                                              strand, newfeatures, newinfo])
                         out.write(newline + '\n')
