@@ -90,7 +90,7 @@ def _item_findClosestPartner(dat, item):
         xindex.append(l.index[0])
     return dat[dat.index.isin(xindex)]
 
-def _plt_percountr(dat, fname):
+def _plt_percountr(dat, independentpdf=False, fname='xpercount.pdf'):
     def _filt_dat(dat, item, getlabel=True):
         df = pd.DataFrame(dat[item].value_counts())
         df.columns = ['count']
@@ -140,15 +140,20 @@ def _plt_percountr(dat, fname):
         ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
         ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
 
-
-    grdevices = importr('grDevices')
-    grdevices.pdf(fname)
-    pt.plot()
-    pt_den.plot()
-    pm.plot()
-    pm_den.plot()
-    grdevices.dev_off()
-
+    if independentpdf:
+        grdevices = importr('grDevices')
+        grdevices.pdf(fname)
+        pt.plot()
+        pt_den.plot()
+        pm.plot()
+        pm_den.plot()
+        grdevices.dev_off()
+    else:
+        pt.plot()
+        pt_den.plot()
+        pm.plot()
+        pm_den.plot()
+    return
 
 def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
     x = dat[col]
@@ -167,15 +172,12 @@ def _plt_pie(dat, pdf, title='', rm_na=False, col="label"):
     plt.close()
     return
 
-def _plt_distr(dat, fname, col, title='', pfill='label'):
+def _plt_distr(dat, col, title='', pfill='label', independentpdf=False, fname='xdistr.pdf'):
     df = dat[dat[pfill] != 'NA'] ## remove invalid pairs
     n  = len(df)
     df = {col: robjects.FloatVector(list(df[col])),
           pfill: robjects.StrVector(list(df[pfill]))}
     df = robjects.DataFrame(df)
-
-    grdevices = importr('grDevices')
-    grdevices.pdf(file=fname)
 
     pp = ggplot2.ggplot(df) + \
         ggplot2.ggtitle('%s [Total = %s]' % (title, n))
@@ -204,9 +206,15 @@ def _plt_distr(dat, fname, col, title='', pfill='label'):
         p2 = p2 + \
             ggplot2.geom_histogram(alpha=.33, position='identity')
 
-    p1.plot()
-    p2.plot()
-    grdevices.dev_off()
+    if independentpdf:
+        grdevices = importr('grDevices')
+        grdevices.pdf(file=fname)
+        p1.plot()
+        p2.plot()
+        grdevices.dev_off()
+    else:
+        p1.plot()
+        p2.plot()
     return
 
 def main(infile, outdir):
@@ -218,10 +226,8 @@ def main(infile, outdir):
     dat_mirna = _item_findClosestPartner(dat, 'mirna')
     dat_tss   = _item_findClosestPartner(dat, 'tss')
 
-    pdf_pie = os.path.join(outdir, 'xpie.pdf')
-    pdf_distr_dist = os.path.join(outdir, 'xdistance.pdf')
-    pdf_distr_corr = os.path.join(outdir, 'xcorrelation.pdf')
-    pdf_per = os.path.join(outdir, 'xper.pdf')
+    pdf_pie    = os.path.join(outdir, 'xpie.pdf')
+    pdf_rplots = os.path.join(outdir, 'xhis.pdf')
 
     with PdfPages(pdf_pie) as pdf:
         _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
@@ -229,13 +235,18 @@ def main(infile, outdir):
         _plt_pie(dat_mirna, pdf, 'Distinct miRNA')
         _plt_pie(dat_tss, pdf, 'Distinct TSS (label from closest miRNA)')
 
-    _plt_distr(dat, pdf_distr_dist, 'distance',    'All valid tss-miRNA pairs')
-    _plt_distr(dat, pdf_distr_corr, 'correlation', 'All valid tss-miRNA pairs')
-    _plt_percountr(dat, pdf_per)
-    _plt_distr(dat_mirna, pdf_distr_dist+'.mirna.pdf', 'distance',    'miRNA to closest TSS')
-    _plt_distr(dat_mirna, pdf_distr_corr+'.mirna.pdf', 'correlation', 'miRNA to closest TSS')
-    _plt_distr(dat_tss, pdf_distr_dist+'.tss.pdf', 'distance',    'TSS to closest miRNA')
-    _plt_distr(dat_tss, pdf_distr_corr+'.tss.pdf', 'correlation', 'TSS to closest miRNA')
+    grdevices = importr('grDevices')
+    grdevices.pdf(file=pdf_rplots)
+
+    _plt_percountr(dat)
+    _plt_distr(dat, 'distance',    'All valid tss-miRNA pairs')
+    _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs')
+    _plt_distr(dat_tss, 'distance',    'TSS to closest miRNA')
+    _plt_distr(dat_tss, 'correlation', 'TSS to closest miRNA')
+    _plt_distr(dat_mirna, 'distance',    'miRNA to closest TSS')
+    _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
+
+    grdevices.dev_off()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
