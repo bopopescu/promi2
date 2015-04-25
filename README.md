@@ -9,6 +9,14 @@
 - [ANNOTATE 3.04 (TRAP: Transcription Factor Affinity Prediction)](http://www.mybiosoftware.com/trap-3-04-transcription-factor-affinity-prediction.html)
 - BIO::Graphics perl module (for e.g. Bio/Graphics/Wiggle.pm)
 
+The following packages are required for [plotting](code/plots.py)
+- Python
+  - pandas
+  - matplotlib
+  - rpy2
+- R
+  - ggplot2
+
 ### Additional input files that you will need to download
 - miRBase (I have provided v20): `hsa.gff2`, `mirna.txt`, `mirna_context.txt`
 

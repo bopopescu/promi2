@@ -6,7 +6,6 @@ import re
 import os
 import sys
 import pandas as pd
-import numpy  as np
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -18,6 +17,15 @@ from rpy2.robjects.lib import ggplot2
 from utils import get_value_from_keycolonvalue_list, ensure_dir
 
 usage = """Generate plots (pie + histogram) with matplotlib and R
+
+Note:
+- If this script is ran via SSH, enable "-X"
+
+Depends on:
+- pandas     (python module)
+- matplotlib (python module)
+- rpy2       (python module)
+- ggplot2    (R package)
 """
 def _filterPredictionsByClass_reformat2gff(infile, outdir, keep='prom'):
     outfile = os.path.join(outdir, os.path.basename(infile)+'.filtered')
@@ -231,11 +239,12 @@ def main(infile, outdir):
     dat_mirna = _item_findClosestPartner(dat, 'mirna')
     dat_tss   = _item_findClosestPartner(dat, 'tss')
 
-    with PdfPages(pdf_pie) as pdf:
-        _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
-        _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
-        _plt_pie(dat_mirna, pdf, 'Distinct miRNA')
-        _plt_pie(dat_tss, pdf, 'Distinct TSS (label from closest miRNA)')
+    pdf = PdfPages(pdf_pie)
+    _plt_pie(dat, pdf, 'All TSS-[miRNA,NA] pairs')
+    _plt_pie(dat, pdf, 'All valid TSS-miRNA pairs', True)
+    _plt_pie(dat_mirna, pdf, 'Distinct miRNA')
+    _plt_pie(dat_tss, pdf, 'Distinct TSS (label from closest miRNA)')
+    pdf.close()
 
     grdevices = importr('grDevices')
     grdevices.pdf(file=pdf_rplots)
@@ -257,7 +266,8 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--infile', dest='infile',
                         required=True,
                         help='''path to input file;
-e.g. output of "label.py"''')
+e.g. output of "label.py"
+"label:" should be contained in the info column (9)''')
 
     parser.add_argument('-o', '--outdir', dest='outdir',
                         default='../Testout-plot',
