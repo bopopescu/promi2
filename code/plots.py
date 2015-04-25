@@ -214,6 +214,10 @@ def _plt_distr(dat, col, title='', pfill='label', independentpdf=False, fname='x
         p2 = p2 + \
             ggplot2.geom_histogram(alpha=.33, position='identity')
 
+        if col == 'correlation':
+            p1 = p1 + ggplot2.xlim(-1.1, 1.1)
+            p2 = p2 + ggplot2.xlim(-1.1, 1.1)
+
     if independentpdf:
         grdevices = importr('grDevices')
         grdevices.pdf(file=fname)
