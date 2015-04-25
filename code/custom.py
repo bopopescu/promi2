@@ -137,6 +137,27 @@ def _reformat_tss_to_1kb(posfile, gff1kb_infile):
                 out.write(newline + '\n')
     return
 
+def _append_mirna(gff_infile, gff_1kbfeatures):
+    outfile = gff_1kbfeatures + '.appendmirna'
+    somedict = {}
+    with open(gff_infile) as f:
+        for l in f:
+            chrom, _, _, start, stop, _, strand, _, mirna = l.strip().split('\t')
+            somedict[','.join([chrom, start, stop, strand])] = mirna
+
+    with open(outfile, 'w') as out:
+        with open(gff_1kbfeatures) as f:
+            for l in f:
+                l = l.strip().split('\t')
+                chrom = l[0]
+                start = l[3]
+                stop  = l[4]
+                strand = l[6]
+                mirna = somedict[','.join([chrom, start, stop, strand])]
+                l[8] = l[8] + ';mirna_partner:%s\n' % mirna
+                out.write('\t'.join(l))
+    return outfile
+
 def _index_1kbfeatures(gff_1kbfeatures):
     feature_index = {}
     with open(gff_1kbfeatures) as f:
@@ -241,14 +262,17 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                   f_fasta, f_chromsizes, d_phastcons, TRAP, f_psemmatrix,
                   gff_1kbfeatures)
 
+    gff_1kbfeatures = _append_mirna(gff_infile, gff_1kbfeatures)
     features_index = _index_1kbfeatures(gff_1kbfeatures)
 
     ## start consolidating features ...
     gff_allfeatures = os.path.join(outdir, 'features.gff')
     with open(gff_allfeatures, 'w') as out:
-        with open(gff_infile) as f:
+        with open(gff_1kbfeatures) as f:
             for l in f:
-                chrom, _, _, start, stop, _, strand, _, mirna = l.strip().split('\t')
+                chrom, _, _, start, stop, _, strand, _, info = l.strip().split('\t')
+                mirna = get_value_from_keycolonvalue_list('mirna_partner',
+                                                          info.split(';'))
                 mirna = mirna.lower()
 
                 ## setting ids...
