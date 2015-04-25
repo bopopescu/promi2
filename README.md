@@ -12,7 +12,6 @@
 The following packages are required for [plotting](code/plots.py)
 - Python
   - pandas
-  - matplotlib
   - rpy2
 - R
   - ggplot2
