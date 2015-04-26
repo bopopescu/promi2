@@ -28,5 +28,4 @@ _For more information, look in the supplement of PROmiRNA_
   and processed to gff format for ...
  1. use in [label.py](../code/label.py) and
  2. subsequent use for plotting in [plots.py](../code/plots.py)
-
 - **Note**: it is acceptible to use another annotation file for [label.py](../code/label.py) given that the new file is in the same format as [miriad_human_labels_v2014.gff](miriad_human_labels_v2014.gff)
