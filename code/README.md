@@ -1,7 +1,8 @@
 # Scripts in this repo
 
-## Generic
+## Multipurpose
 - `utils.py` - module of utility functions
+- `label.py` - module for labelling miRNA as intragenic/intergenic/unknown/NA
 
 ## Creating the training set
 1. `tc_normalization.py` - performs rle normalization on tag counts (used for creating the negative training set)
@@ -67,7 +68,6 @@ python2.7 summarize-results.py -f '../test/test-summary/Predictions.*' -o ../Tes
 * * *
 New! (todo)
 - custom.py
-- label.py
 - plots.py
 
 * * *

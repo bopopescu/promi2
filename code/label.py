@@ -6,7 +6,13 @@ from utils import get_value_from_keycolonvalue_list, ensure_dir
 import re
 
 usage = """
-- Add intragenic/intergenic label info for mirna
+- Adds 'intragenic'/'intergenic' label info for mirna
+
+- label 'NA' is when mirna_start and mirna_stop is
+  not found in the info column
+- label 'unknown' is when mirna_start and mirna_stop is
+  found in the info column, but the mirna is
+  not found in the annotation file
 """
 def _labelfile2dict_matchPos(labelfile):
     label_dict = {}
