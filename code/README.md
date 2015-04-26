@@ -73,8 +73,7 @@ New! (todo)
 # Correlation
 ## Create training set
 - To enable the correlation feature, you need to create a dataset that contains the correlation extracted feature:
-- Run create training set with `computecorrelation = on`
-- Make sure `srnaseqmatrix` and `cageseqmatrix` is enabled
+- Make sure `srnaseqmatrix` and `cageseqmatrix` is filled in
 
 ## Training to get beta5
 - In `trainingfeatures`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr` (e.g. add the "corr" feature)

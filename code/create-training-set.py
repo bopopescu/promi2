@@ -503,7 +503,6 @@ def main(files, outdir, N, percent_lib, is_get_id, f_config, verbose = False):
     m_mirna      = cparser.get('correlation','srnaseqmatrix')
     m_tss        = cparser.get('correlation','cageseqmatrix')
     corrmethod   = cparser.get('correlation','corrmethod')
-    computecorr  = cparser.get('training','computecorrelation')
 
     f_trainingset = os.path.join(outdir, 'TrainingSet.gff')
     outdir1 = f_trainingset + '_intermediates'
@@ -598,8 +597,8 @@ def main(files, outdir, N, percent_lib, is_get_id, f_config, verbose = False):
                     pos_list.append(pos)
                     out.write(line)
 
-    if computecorr != 'on':
-        return f_trainingset, ''
+    if not (os.path.isfile(m_mirna) and os.path.isfile(m_tss)):
+        return f_trainingset
 
     ## create final training set with feature:correlation of closest tss->miRNA ...
     if verbose: print 'STATUS: creating final training set with correlation of closest tss->miRNA...'
@@ -612,7 +611,7 @@ def main(files, outdir, N, percent_lib, is_get_id, f_config, verbose = False):
                          f_tcfilesinput,
                          corrmethod, f_trainingset2)
 
-    return f_trainingset, f_trainingset2
+    return f_trainingset2
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
