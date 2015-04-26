@@ -20,7 +20,7 @@ python2.7 create-training-set.py -f '/path/to/*.gff' -o ../Testout-tset -c confi
 ```
 ## You need to first update "config.ini"
 
-python2.7 training.py -i ../test/test-trainset.gff
+python2.7 training.py -i ../Test-tset/TrainingSet.gff -c config.ini
 ```
 
 ## Using the model

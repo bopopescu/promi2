@@ -16,7 +16,7 @@ usage = """Assumption
 - background set will contain '*back*' in 3rd column of gff file
 
 EXAMPLE:
-python2.7 training.py -i ../test/test-trainset.gff
+python2.7 training.py -i ../Test-tset/TrainingSet.gff
 """
 def _trainset_to_formatgff(infile, outfile):
     ## this was the original format:
