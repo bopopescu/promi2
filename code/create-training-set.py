@@ -14,7 +14,7 @@ from utils import random_string, get_value_from_keycolonvalue_list, ensure_dir, 
 import features
 import linecache
 import tc_normalization
-#from correlation import _find_miRNA_pos, _compute_correlation
+from correlation import _find_miRNA_pos, _compute_correlation
 import mirna_proximity
 import gff_unify_features
 
