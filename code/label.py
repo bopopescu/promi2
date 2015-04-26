@@ -43,7 +43,8 @@ def main(infile, labelfile, outfile):
                 chrom  = line[0]
                 strand = line[6]
 
-                info   = line[8].strip(';').split(';')
+                info   = line[8].strip(';')
+                info   = re.split('[;@]', info)
 
                 mstart = get_value_from_keycolonvalue_list('mirna_start', info)
                 mstop  = get_value_from_keycolonvalue_list('mirna_stop', info)
@@ -54,6 +55,9 @@ def main(infile, labelfile, outfile):
                     label = 'NA'
                 else:
                     mirna = get_value_from_keycolonvalue_list('mirbase_id', info)
+                    if mirna == '':
+                        mirna = get_value_from_keycolonvalue_list('mirna_id', info)
+
                     mirna = re.match('^(\w*-\w*-\d*)', mirna).group(1)
                     if label_dict.has_key(mirna):
                         label = label_dict[mirna]
