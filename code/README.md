@@ -2,7 +2,7 @@
 
 ## Multipurpose
 - `utils.py` - module of utility functions
-- `label.py` - module for labelling miRNA as intragenic/intergenic/unknown/NA
+- `label.py` - adds miRNA labelling: intragenic/intergenic/unknown/NA based on an annotation file
 
 ## Creating the training set
 1. `tc_normalization.py` - performs rle normalization on tag counts (used for creating the negative training set)
