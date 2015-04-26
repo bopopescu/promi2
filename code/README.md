@@ -26,9 +26,12 @@ python2.7 training.py -i ../Test-tset/TrainingSet.gff -c config.ini
 ## Using the model
 1. `features.py` - performs sequence feature extraction of CpG content, conservation, and TATA box affinity
 2. `mirna_proximity.py` - performs miRNA proximity feature extraction (requires the use of miRBase files)
-3. `gff_unify_features.py` - performs `bedtools intersect ... -s -f 1 -r -wao`
-4. `promirna.py` - module of core mathematical formulas from PROmiRNA
-5. `promi2.py` - runs scripts 1-4 of "using the model"
+3. `correlation.py` - **new feature**; performs correlation feature extraction
+                      (requires 'srnaseqmatrix' and 'cageseqmatrix' to be filled in the config file;
+                       see below instructions for enabling this feature)
+4. `gff_unify_features.py` - performs `bedtools intersect ... -s -f 1 -r -wao`
+5. `promirna.py` - module of core mathematical formulas from PROmiRNA
+6. `promi2.py` - runs scripts 1-5 of "using the model"
 
 ```
 ## You need to first update "config.ini"
@@ -63,8 +66,6 @@ python2.7 summarize-results.py -f '../test/test-summary/Predictions.*' -o ../Tes
 
 * * *
 New! (todo)
-
-- correlation.py
 - custom.py
 - label.py
 - plots.py
