@@ -9,6 +9,7 @@ import os
 from utils import get_value_from_keycolonvalue_list, ensure_dir, random_string
 import features
 import mirna_proximity
+import correlation
 import gff_unify_features
 import promirna
 
@@ -153,14 +154,11 @@ def main(f_config, gff_cage, is_gff, outdir):
             ## merge extracted features (gff_unify_features.py)
             gff_features_corr = os.path.join(outdir,
                                              'ALLfeaturesCORR' + corrmethod + '.' + in_bname)
-            gff_corr = cparser.get('correlation', 'corrmethod')
-            gff_features_corr_tmp = gff_features_corr + '.tmp'
-            gff_unify_features.main(gff_features, gff_corr, 'corr', '0', gff_features_corr_tmp)
-
-            ## cleanup extra positions
-            _cleanup_extra_positions(gff_features_corr_tmp, gff_features_corr)
-            os.system('rm %s' % gff_features_corr+'.tmp')
-
+            m_mirna = cparser.get('correlation', 'srnaseqmatrix')
+            m_tss   = cparser.get('correlation', 'cageseqmatrix')
+            outdir_corr = os.path.join(outdir, 'corr')
+            gff_corr = correlation.main(gff_mirna, m_mirna, m_tss, corrmethod, outdir_corr)
+            gff_unify_features.main(gff_features, gff_corr, 'corr', '0', gff_features_corr)
             gff_allfeatures = gff_features_corr
         else:
             gff_allfeatures = gff_features
