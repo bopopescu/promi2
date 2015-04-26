@@ -19,3 +19,11 @@ _For more information, look in the supplement of PROmiRNA_
 ## Files related to the human genome
 - Files: `hg19.fa`, `hg19_repeats.bed`, `hg19.chrom.sizes`, `Homo_sapiens.GRCh37.75.gtf`
 - You can find the files included in the ExternalData of http://promirna.molgen.mpg.de
+
+* * *
+## [miRIAD](http://www.bioinfo.mochsl.org.br/miriad): labelling miRNA as	intragenic/intergenic
+- File: [miriad_human_labels_v2014.gff](miriad_human_labels_v2014.gff)
+- The annotation file was [download](http://www.bioinfo.mochsl.org.br/miriad/downloads) 
+  and processed to gff format for ...
+ 1. use in [label.py](../code/label.py) and 
+ 2. subsequent use for plotting in [plots.py](../code/plots.py)
