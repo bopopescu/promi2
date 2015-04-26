@@ -500,8 +500,8 @@ def main(files, outdir, N, percent_lib, is_get_id, f_config, verbose = False):
     TRAP         = cparser.get('tata','trap')
     f_psemmatrix = cparser.get('tata','psem')
     f_traincfg   = cparser.get('configs','tcconfig')
-    m_mirna      = cparser.get('training','srnaseqmatrix')
-    m_tss        = cparser.get('training','cageseqmatrix')
+    m_mirna      = cparser.get('correlation','srnaseqmatrix')
+    m_tss        = cparser.get('correlation','cageseqmatrix')
     corrmethod   = cparser.get('correlation','corrmethod')
     computecorr  = cparser.get('training','computecorrelation')
 
