@@ -131,34 +131,48 @@ def main(f_config, gff_cage, is_gff, outdir):
     ## PART1: Feature extraction
     if not is_gff:
         ## feature extraction: cpg, cons, tata (features.py)
-        gff_1kbfeatures = os.path.join(outdir, 'featuresgff_1kb.'+in_bname)
+        outdir_seqfeatures = os.path.join(outdir, 'seqfeatures')
+        ensure_dir(outdir_seqfeatures, False)
+
+        gff_1kbfeatures = os.path.join(outdir_seqfeatures, 'features_1kbseq.gff')
+
         f_fasta      = cparser.get('genome','fasta')
         f_chromsizes = cparser.get('genome','chromsizes')
         d_phastcons  = cparser.get('cons','phastcons')
         TRAP         = cparser.get('tata','trap')
         f_psemmatrix = cparser.get('tata','psem')
-        features.main(gff_cage, outdir,
+
+        features.main(gff_cage, outdir_seqfeatures,
                       f_fasta, f_chromsizes, d_phastcons, TRAP, f_psemmatrix,
                       gff_1kbfeatures)
 
         ## feature extraction: mirna_proximity (mirna_proximity.py)
-        gff_mirnaprox = os.path.join(outdir, 'featuresgff_mirnaprox.'+in_bname)
+        outdir_mprox = os.path.join(outdir, 'mprox')
+        ensure_dir(outdir_mprox, False)
+
+        gff_mirnaprox = os.path.join(outdir_mprox, 'features_mirnaprox.gff')
+
         gff_mirna     = cparser.get('mirbase','gff2')
+
         mirna_proximity.main(gff_cage, gff_mirna, gff_mirnaprox)
 
         ## merge extracted features (gff_unify_features.py)
-        gff_features = os.path.join(outdir, 'ALLfeatures.'+in_bname)
+        gff_features = os.path.join(outdir, 'Features.1kb.mprox.'+in_bname)
         gff_unify_features.main(gff_1kbfeatures, gff_mirnaprox, 'mirna_prox', '0', gff_features)
 
         if is_consider_corr:
-            ## merge extracted features (gff_unify_features.py)
+            ## merge extracted features (gff_unify_features.py) after compute correlation
             gff_features_corr = os.path.join(outdir,
-                                             'ALLfeaturesCORR' + corrmethod + '.' + in_bname)
+                                             'Features.1kb.mprox.%s.%s' % (corrmethod, in_bname))
+
+            outdir_corr = os.path.join(outdir, 'corr')
+
             m_mirna = cparser.get('correlation', 'srnaseqmatrix')
             m_tss   = cparser.get('correlation', 'cageseqmatrix')
-            outdir_corr = os.path.join(outdir, 'corr')
+
             gff_corr = correlation.main(gff_mirna, m_mirna, m_tss, corrmethod, outdir_corr)
             gff_unify_features.main(gff_features, gff_corr, 'corr', '0', gff_features_corr)
+
             gff_allfeatures = gff_features_corr
         else:
             gff_allfeatures = gff_features
