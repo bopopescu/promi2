@@ -203,9 +203,9 @@ Tab-separated columns should be like:
   4. start (+500)
   5. stop (-500)
   6. normalized tag count
-  5. strand
-  6. .
-  7. info
+  7. strand
+  8. .
+  9. info
 ''')
     parser.add_argument('-f', dest='is_gff',
                         action='store_true',
