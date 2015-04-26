@@ -68,3 +68,25 @@ New! (todo)
 - custom.py
 - label.py
 - plots.py
+
+* * *
+# Correlation
+## Create training set
+- To enable the correlation feature, you need to create a dataset that contains the correlation extracted feature:
+- Run create training set with `computecorrelation = on`
+- Make sure `srnaseqmatrix` and `cageseqmatrix` is enabled
+
+## Training to get beta5
+- In `trainingfeatures`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr` (e.g. add the "corr" feature)
+- Train in TrainingSet-corr.gff (not TrainingSet.gff)
+
+## Using correlation feature with promi2
+- Update the `params` to TrainingSet-corr.gff.finalparams generated in the previous step
+- In `features`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr`
+- Run promi2!
+
+- memo: using promi2.py expects normalized cage matrix (?)
+
+
+
+
