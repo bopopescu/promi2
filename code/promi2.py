@@ -153,7 +153,7 @@ def main(f_config, gff_cage, is_gff, outdir):
             ## merge extracted features (gff_unify_features.py)
             gff_features_corr = os.path.join(outdir,
                                              'ALLfeaturesCORR' + corrmethod + '.' + in_bname)
-            gff_corr = cparser.get('correlation', corrmethod)
+            gff_corr = cparser.get('correlation', 'corrmethod')
             gff_features_corr_tmp = gff_features_corr + '.tmp'
             gff_unify_features.main(gff_features, gff_corr, 'corr', '0', gff_features_corr_tmp)
 
