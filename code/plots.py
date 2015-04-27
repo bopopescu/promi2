@@ -75,7 +75,7 @@ def _read_dat(gff_infile):
     dat.columns = ['tss', 'mirna', 'mirna_id', 'label', 'Distance', 'distance', 'correlation']
     return dat
 
-def _item_findClosestPartner(dat, item):
+def _item_findClosestPartner(dat, item, ignoreCorr):
     df = dat[dat['label'] != 'NA'] ## remove invalid pairs
 
     xindex = []
@@ -85,9 +85,12 @@ def _item_findClosestPartner(dat, item):
         ## min distance
         submd = subm[subm['distance'] == subm['distance'].min()]
 
-        ## absmax correlation
-        l = submd['correlation'].astype(float).abs()
-        l = l[l == l.max()]
+        if ignoreCorr:
+            l = submd
+        else:
+            ## absmax correlation
+            l = submd['correlation'].astype(float).abs()
+            l = l[l == l.max()]
 
         xindex.append(l.index[0])
     return dat[dat.index.isin(xindex)]
@@ -254,8 +257,14 @@ def main(infile, outdir):
     pdf_rplots = os.path.join(outdir, bname + '.plots.pdf')
 
     dat = _read_dat(infile)
-    dat_mirna = _item_findClosestPartner(dat, 'mirna')
-    dat_tss   = _item_findClosestPartner(dat, 'tss')
+
+    if all(dat['correlation'] == ''):
+        ignoreCorr = True
+    else:
+        ignoreCorr = False
+
+    dat_mirna = _item_findClosestPartner(dat, 'mirna', ignoreCorr)
+    dat_tss   = _item_findClosestPartner(dat, 'tss',   ignoreCorr)
 
     grdevices = importr('grDevices')
     grdevices.pdf(file=pdf_rplots)
@@ -263,19 +272,20 @@ def main(infile, outdir):
     _plt_pier(dat, 'All TSS-[miRNA,NA] pairs')
     _plt_pier(dat, 'All valid TSS-miRNA pairs', True)
     _plt_distr(dat, 'distance',    'All valid tss-miRNA pairs')
-    _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs')
+    if not ignoreCorr: _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs')
 
     _plt_percountr(dat)
 
     _plt_pier(dat_tss,   'Distinct TSS (label from closest miRNA)')
     _plt_distr(dat_tss, 'distance',    'TSS to closest miRNA')
-    _plt_distr(dat_tss, 'correlation', 'TSS to closest miRNA')
+    if not ignoreCorr: _plt_distr(dat_tss, 'correlation', 'TSS to closest miRNA')
 
     _plt_pier(dat_mirna, 'Distinct miRNA')
     _plt_distr(dat_mirna, 'distance',    'miRNA to closest TSS')
-    _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
+    if not ignoreCorr: _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
 
     grdevices.dev_off()
+    print pdf_rplots
     return pdf_rplots
 
 if __name__ == '__main__':
