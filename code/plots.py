@@ -2,6 +2,7 @@
 # Author:  csiu
 # Created: 2015-04-24
 import argparse
+from ConfigParser import SafeConfigParser
 import re
 import os
 import sys
@@ -13,6 +14,7 @@ from rpy2.robjects.lib import ggplot2
 from rpy2.robjects import r
 
 from utils import get_value_from_keycolonvalue_list, ensure_dir
+import label as lb
 
 usage = """Generate plots (pie + histogram) with R via rpy2
 
@@ -21,6 +23,27 @@ Depends on:
 - rpy2       (python module)
 - ggplot2    (R package)
 """
+def _check_labelling(infile, labelfile):
+    ## simple check
+    with open(infile) as f:
+        for l in f:
+            info = l.strip().split('\t')[8].split(';')
+            label = get_value_from_keycolonvalue_list('mirna_label', info)
+            if label == '':
+                isLabelled = False
+            else:
+                isLabelled = True
+            break
+
+    if isLabelled:
+        return infile
+    else:
+        print '## No labelling is found, proceed with labelling...'
+        outfile = '%s.label' % infile
+
+        lb.main(infile, labelfile, outfile)
+        return outfile
+
 def _filterPredictionsByClass_reformat2gff(infile, outdir, keep='prom'):
     outfile = os.path.join(outdir, os.path.basename(infile)+'.filtered')
     with open(outfile, 'w') as out:
@@ -247,10 +270,15 @@ def _plt_pier(dat, title='', rm_na=False, col='label',
         grdevices.dev_off()
     return
 
-def main(infile, outdir):
+def main(infile, outdir, config):
     outdir = os.path.abspath(outdir)
     ensure_dir(outdir, False)
 
+    cparser = SafeConfigParser()
+    cparser.read(config)
+    labelfile = cparser.get('configs', 'labelfile')
+
+    infile = _check_labelling(infile, labelfile)
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
 
     bname = os.path.basename(infile)
@@ -285,6 +313,7 @@ def main(infile, outdir):
     if not ignoreCorr: _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
 
     grdevices.dev_off()
+    print '## Generating plot file...'
     print pdf_rplots
     return pdf_rplots
 
@@ -296,14 +325,18 @@ if __name__ == '__main__':
                         required=True,
                         help='''path to input file;
 e.g. output of "label.py"
-"label:" should be contained in the info column (9)''')
+"mirna_label:" should be contained in the info column (9)''')
 
     parser.add_argument('-o', '--outdir', dest='outdir',
                         default='../Testout-plot',
                         help='''specify path to output directory''')
 
+    parser.add_argument('-c', '--config', dest='config',
+                        default='config.ini',
+                        help='path to config file; default="config.ini"')
+
     ##get at the arguments
     args = parser.parse_args()
 
     ## do something..
-    main(args.infile, args.outdir)
+    main(args.infile, args.outdir, args.config)
