@@ -1,0 +1,10 @@
+mu_promoter:19
+mu_background:1
+lambda_promoter:0.6
+lambda_background:1.0
+beta0:-6
+beta1:10
+beta2:19
+beta3:9
+beta4:9
+beta5:10
