@@ -24,13 +24,14 @@ python2.7 create-training-set.py -f '/path/to/*.gff' -o ../Testout-tset -c confi
 
 python2.7 training.py -i ../Test-tset/TrainingSet.gff -c config.ini
 ```
+**Note:** See below if you want to enable training with the correlation feature
 
 ## Using the model
 1. `features.py` - performs sequence feature extraction of CpG content, conservation, and TATA box affinity
 2. `mirna_proximity.py` - performs miRNA proximity feature extraction (requires the use of miRBase files)
 3. `correlation.py` - **new feature**; performs correlation feature extraction
-                      (requires 'srnaseqmatrix' and 'cageseqmatrix' to be filled in the config file;
-                       see below instructions for enabling this feature)
+                      (requires 'srnaseqmatrix' and 'cageseqmatrix', in the config file, to be filled;
+                       see instructions below for enabling this feature)
 4. `gff_unify_features.py` - performs `bedtools intersect ... -s -f 1 -r -wao`
 5. `promirna.py` - module of core mathematical formulas from PROmiRNA
 6. `promi2.py` - runs scripts 1-5 of "using the model"
@@ -71,22 +72,17 @@ New! (todo)
 - custom.py
 
 * * *
-# Correlation
-## Create training set
-- To enable the correlation feature, you need to create a dataset that contains the correlation extracted feature:
-- Make sure `srnaseqmatrix` and `cageseqmatrix` is filled in
-
-## Training to get beta5
-- In `trainingfeatures`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr` (e.g. add the "corr" feature)
-- Train in TrainingSet-corr.gff (not TrainingSet.gff)
-
+# Enabling Correlation
 ## Using correlation feature with promi2
-- Update the `params` to TrainingSet-corr.gff.finalparams generated in the previous step
-- In `features`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr`
-- Run promi2!
-
-- memo: using promi2.py expects normalized cage matrix (?)
-
-
+1. At the "Creating the training set" step, you will need to create a dataset which contains the extracted correlation
+ - Make sure `srnaseqmatrix =` and `cageseqmatrix =`, in the [config](config.ini) file, is filled in
+2. At the "Training the model" step, you will neet to tell the program to include correlation as a feature
+ - In `trainingfeatures =`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr`
+ - Also make sure to train with training set with the extracted correlations 
+   (e.g. "TrainingSet-corr.gff" -- not "TrainingSet.gff")
+3. At the "Using the model" step, you will need to tell promi2 to use the corrlelation feature as well as the new parameters
+ - Update `params =` to the resulting `*finalparams` file generated in the previous step
+ - In `features =`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr`
+ - **Note:** promi2 also expects `cageseqmatrix =` to be filled out
 
 
