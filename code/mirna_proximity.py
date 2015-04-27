@@ -118,14 +118,17 @@ def _make_newline(l, d):
                          new_info])
     return newline
 
-def mirna_proximity(fi_cage, f_mirna, f_out):
+def mirna_proximity(fi_cage, f_mirna, f_out, swapcol=True):
     ## check that chr is stripped off f_mirna
     f_mirna = _validate_mirbase(f_mirna)
 
-    ## start & stop columns represent the +/-500bp region around TSS
-    ## made it so that these columns represent the actual TSS range
-    f_cage = f_out  + '.actualTSSregion.gff'
-    _swap_columns(fi_cage, f_cage)
+    if swapcol:
+      ## start & stop columns represent the +/-500bp region around TSS
+      ## made it so that these columns represent the actual TSS range
+      f_cage = f_out  + '.actualTSSregion.gff'
+      _swap_columns(fi_cage, f_cage)
+    else:
+      f_cage = fi_cage
 
     ## find TSS associated with the 50kbp upstream of each miRNA
     f_overlap = f_out + 'cage_50kbpUpmirna_overlap.tmp'
