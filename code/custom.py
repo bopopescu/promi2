@@ -358,7 +358,7 @@ def main(f_config, gff_infile, outdir, has_mirna, make_plots):
     if make_plots:
         import plots
         outdir_plt = os.path.join(outdir, 'plots')
-        plots.main(fo_labelledpredictions, outdir_plt)
+        plots.main(fo_labelledpredictions, outdir_plt, f_config)
 
     return fo_labelledpredictions
 
