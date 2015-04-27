@@ -31,7 +31,7 @@ Notes:
 - when miRNA partner is given, add "-m"
 
 Examples:
-python custom.py -i ../test/test-custom.gff -o ../Testout-custom -p [-m]
+python2.7 custom.py -i ../test/test-custom.gff -o ../Testout-custom -p [-m]
 """
 def _reformat_infile_gff2tcnorm(infile, outfile):
     with open(outfile, 'w') as out:
