@@ -28,6 +28,9 @@ These are large files; you can find them included in the [ExternalData](http://p
   - `hg19.chrom.sizes`
   - `Homo_sapiens.GRCh37.75.gtf`
 
+## Usage
+Code usage [here](code/README.md).
+
 ## Reference
 1. Marsico A, Huska MR, Lasserre J, Hu H, Vucicevic D, Musahl A, Orom U, Vingron M. (2013). [PROmiRNA: a new miRNA promoter recognition method uncovers the complex regulation of intronic miRNAs](http://genomebiology.com/2013/14/8/R84). Genome Biology, 14(8):R84. doi: 10.1186/gb-2013-14-8-r84.
 2. Kozomara A, Griffiths-Jones S. (2014). [miRBase: annotating high confidence microRNAs using deep sequencing data](http://nar.oxfordjournals.org/content/42/D1/D68). Nucleic Acids Research, 42(Database issue):D68-73. doi: 10.1093/nar/gkt1181.
