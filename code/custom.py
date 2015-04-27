@@ -207,8 +207,30 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
     tcparser.read(tc_config)
     f_ids = tcparser.get('tc_normalization', 'ids')
 
+    ## PART2: compute features
+    ## compute cpg, cons, tata ...
+    outdir_seqfeatures = os.path.join(outdir, 'seqfeatures/')
+    ensure_dir(outdir_seqfeatures)
 
-    ## PART2: correlation setup
+    f_fasta      = cparser.get('genome','fasta')
+    f_chromsizes = cparser.get('genome','chromsizes')
+    d_phastcons  = cparser.get('cons','phastcons')
+    TRAP         = cparser.get('tata','trap')
+    f_psemmatrix = cparser.get('tata','psem')
+
+    gff1kb_infile   = os.path.join(outdir_seqfeatures, 'infile_1kbseq.gff')
+    gff_1kbfeatures = os.path.join(outdir_seqfeatures, 'features_1kbseq.gff')
+
+    _reformat_tss_to_1kb(f1_pos, gff1kb_infile)
+
+    features.main(gff1kb_infile, outdir_seqfeatures,
+                  f_fasta, f_chromsizes, d_phastcons, TRAP, f_psemmatrix,
+                  gff_1kbfeatures)
+
+    features_index = _index_1kbfeatures(gff_1kbfeatures)
+
+    ## PART3: compute corr
+    ## correlation setup:
     outdir_corr = os.path.join(outdir, 'corr/')
     ensure_dir(outdir_corr)
 
@@ -240,29 +262,7 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
 
     pairid_index = _index_corr_pairid(fo_corr, has_mirna)
 
-    ## PART3: compute features
-    ## compute cpg, cons, tata ...
-    outdir_seqfeatures = os.path.join(outdir, 'seqfeatures/')
-    ensure_dir(outdir_seqfeatures)
-
-    f_fasta      = cparser.get('genome','fasta')
-    f_chromsizes = cparser.get('genome','chromsizes')
-    d_phastcons  = cparser.get('cons','phastcons')
-    TRAP         = cparser.get('tata','trap')
-    f_psemmatrix = cparser.get('tata','psem')
-
-    gff1kb_infile   = os.path.join(outdir_seqfeatures, 'infile_1kbseq.gff')
-    gff_1kbfeatures = os.path.join(outdir_seqfeatures, 'features_1kbseq.gff')
-
-    _reformat_tss_to_1kb(f1_pos, gff1kb_infile)
-
-    features.main(gff1kb_infile, outdir_seqfeatures,
-                  f_fasta, f_chromsizes, d_phastcons, TRAP, f_psemmatrix,
-                  gff_1kbfeatures)
-
-    features_index = _index_1kbfeatures(gff_1kbfeatures)
-
-    ## start consolidating features ...
+    ## PART4: start consolidating features ...
     gff_allfeatures = os.path.join(outdir, 'features.gff')
     with open(gff_allfeatures, 'w') as out:
         with open(gff_infile) as f:
