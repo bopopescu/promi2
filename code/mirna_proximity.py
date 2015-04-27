@@ -99,7 +99,6 @@ def _make_newline(l, d):
     info = l[8].split(';')
     region_up   = get_value_from_keycolonvalue_list('region_start', info)
     region_down = get_value_from_keycolonvalue_list('region_stop', info)
-    sid = get_value_from_keycolonvalue_list('id', info)
 
     mirna_start = l[12]
     mirna_stop  = l[13]
@@ -109,7 +108,7 @@ def _make_newline(l, d):
     mirna_id  = get_value_from_keycolonvalue_list('ID', mirna_info, '=')
 
 
-    new_info = ';'.join(['distance:'+str(d), 'id:'+sid,
+    new_info = ';'.join(['distance:'+str(d),
                          #'region_start:'+region_up, 'region_stop:'+region_down,
                          'mirna_acc:'+mirna_acc, 'mirna_id:'+mirna_id,
                          'mirna_start:'+mirna_start, 'mirna_stop:'+mirna_stop])
