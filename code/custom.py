@@ -29,6 +29,9 @@ Notes:
 - 'tcnorm.ini' needs to be filled in
 - for enabling plot generation, add "-p"
 - when miRNA partner is given, add "-m"
+
+Examples:
+python custom.py -i ../test/test-custom.gff -o ../Testout-custom -p [-m]
 """
 def _reformat_infile_gff2tcnorm(infile, outfile):
     with open(outfile, 'w') as out:
