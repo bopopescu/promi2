@@ -13,6 +13,7 @@ import tc_normalization
 import correlation
 import mirna_proximity
 import features
+import gff_unify_features
 import promi2
 import label
 
@@ -111,6 +112,52 @@ def _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos):
                     out.write(newline + '\n')
     return
 
+def _index_mprox_pairid(gff_mprox):
+    pairid_index = {}
+    with open(gff_mprox) as f:
+        c = 0
+        for l in f:
+            c += 1
+
+            chrom, _, _, start, stop, _, strand, _, info = l.strip().rsplit('\t')
+            info    = info.split(';')
+
+            pid = '.'.join([chrom, start, stop, strand])
+            mirna = get_value_from_keycolonvalue_list('mirna_id', info)
+            val = c
+
+            try:
+                pairid_index[pid].append(val)
+            except KeyError:
+                pairid_index[pid] = [val]
+
+    return pairid_index
+
+def _index_feat(gff_ufeat, has_mirna):
+    pairid_index = {}
+    with open(gff_ufeat) as f:
+        c = 0
+        for l in f:
+            c += 1
+
+            chrom, _, _, start, stop, _, strand, _, info = l.strip().rsplit('\t')
+            info    = info.split(';')
+
+            pid = '.'.join([chrom, start, stop, strand])
+            if has_mirna:
+                ##FIXME
+                mirna = get_value_from_keycolonvalue_list('mirna_query', info)
+                val = '%s:%s' % (mirna, c)
+            else:
+                val = c
+
+            try:
+                pairid_index[pid].append(val)
+            except KeyError:
+                pairid_index[pid] = [val]
+
+    return pairid_index
+
 def _index_corr_pairid(gff_corr, has_mirna):
     pairid_index = {}
     with open(gff_corr) as f:
@@ -173,12 +220,21 @@ def _index_1kbfeatures(gff_1kbfeatures):
 
     return feature_index
 
-def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
+def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider_corr):
     cparser = SafeConfigParser()
     cparser.read(config)
 
     tc_config = cparser.get('configs', 'tcconfig')
     m_mirna   = cparser.get('correlation', 'srnaseqmatrix')
+
+    f_fasta      = cparser.get('genome','fasta')
+    f_chromsizes = cparser.get('genome','chromsizes')
+    d_phastcons  = cparser.get('cons','phastcons')
+    TRAP         = cparser.get('tata','trap')
+    f_psemmatrix = cparser.get('tata','psem')
+
+    mirbase_gff2 = cparser.get('mirbase', 'gff2')
+    corrmethod   = cparser.get('correlation', 'corrmethod')
 
     ## PART1: tc normalization
     ## 1a. setup infile
@@ -207,16 +263,9 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
     tcparser.read(tc_config)
     f_ids = tcparser.get('tc_normalization', 'ids')
 
-    ## PART2: compute features
-    ## compute cpg, cons, tata ...
+    ## PART2: compute cpg, cons, tata ...
     outdir_seqfeatures = os.path.join(outdir, 'seqfeatures/')
     ensure_dir(outdir_seqfeatures)
-
-    f_fasta      = cparser.get('genome','fasta')
-    f_chromsizes = cparser.get('genome','chromsizes')
-    d_phastcons  = cparser.get('cons','phastcons')
-    TRAP         = cparser.get('tata','trap')
-    f_psemmatrix = cparser.get('tata','psem')
 
     gff1kb_infile   = os.path.join(outdir_seqfeatures, 'infile_1kbseq.gff')
     gff_1kbfeatures = os.path.join(outdir_seqfeatures, 'features_1kbseq.gff')
@@ -229,38 +278,55 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
 
     features_index = _index_1kbfeatures(gff_1kbfeatures)
 
-    ## PART3: compute corr
-    ## correlation setup:
-    outdir_corr = os.path.join(outdir, 'corr/')
-    ensure_dir(outdir_corr)
+    ## PART3: compute mprox ...
+    if not has_mirna:
+        outdir_tmp = os.path.join(outdir, 'intermediates')
+        ensure_dir(outdir_tmp, False)
 
-    mirbase_gff2 = cparser.get('mirbase', 'gff2')
-    corrmethod   = cparser.get('correlation', 'corrmethod')
-    gff_mirna = os.path.join(outdir_corr, '4corr_mirna.gff')
-    gff_tss   = os.path.join(outdir_corr, '4corr_tss.gff')
-    pair_pos    = os.path.join(outdir_corr, '4corrPair_row_pos_tss-mirna.txt')
-    pair_sample = os.path.join(outdir_corr, '4corrPair_col_sample_CAGE-sRNAseq.txt')
-    fo_corr = os.path.join(outdir_corr, 'features_correlation-%s.gff' % corrmethod)
+        gff_mproxfeatures = os.path.join(outdir_tmp, 'features_mprox.gff')
+        gff_ufeat1 = os.path.join(outdir_tmp, 'features.1kb.mprox.gff')
 
-    ## position pair:
-    correlation._find_miRNA_pos(m_mirna, mirbase_gff2, gff_mirna)
-    correlation._get_tss_pos(f1_pos, gff_tss)
-    if has_mirna:
-        _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos)
+        mirna_proximity.main(gff1kb_infile, mirbase_gff2, gff_mproxfeatures)
+        gff_unify_features.main(gff_1kbfeatures, gff_mproxfeatures, 'mirna_prox', '0', gff_ufeat1, True)
+
+    ## PART4: compute corr
+    if is_consider_corr:
+        ## correlation setup:
+        outdir_corr = os.path.join(outdir, 'corr')
+        ensure_dir(outdir_corr, False)
+
+        gff_mirna = os.path.join(outdir_corr, '4corr_mirna.gff')
+        gff_tss   = os.path.join(outdir_corr, '4corr_tss.gff')
+        pair_pos    = os.path.join(outdir_corr, '4corrPair_row_pos_tss-mirna.txt')
+        pair_sample = os.path.join(outdir_corr, '4corrPair_col_sample_CAGE-sRNAseq.txt')
+        fo_corr = os.path.join(outdir_corr, 'features_correlation-%s.gff' % corrmethod)
+        gff_ufeat2 = os.path.join(outdir_tmp, 'features.1kb.mprox.corr.gff')
+
+        ## position pair:
+        correlation._find_miRNA_pos(m_mirna, mirbase_gff2, gff_mirna)
+        correlation._get_tss_pos(f1_pos, gff_tss)
+        if has_mirna:
+            _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos)
+        else:
+            correlation._get_tss_mirna_pairings(gff_tss, gff_mirna, pair_pos)
+
+        ## sample pair:
+        srnaseq_index = correlation._index_srnaseq(m_mirna)
+        cage_index    = _index_tcnorm(f_ids)
+        correlation._get_sample_pairings(cage_index, srnaseq_index, pair_sample)
+
+        ## compute correlation:
+        correlation._compute_correlation(pair_pos, pair_sample,
+                                         f_rle, m_mirna,
+                                         fo_corr, corrmethod, '.')
+
+        gff_unify_features.main(gff_ufeat1, fo_corr, 'corr', '0', gff_ufeat2, True)
+
+        gff_ufeat = gff_ufeat2
     else:
-        correlation._get_tss_mirna_pairings(gff_tss, gff_mirna, pair_pos)
+        gff_ufeat = gff_ufeat1
 
-    ## sample pair:
-    srnaseq_index = correlation._index_srnaseq(m_mirna)
-    cage_index    = _index_tcnorm(f_ids)
-    correlation._get_sample_pairings(cage_index, srnaseq_index, pair_sample)
-
-    ## compute correlation:
-    correlation._compute_correlation(pair_pos, pair_sample,
-                                     f_rle, m_mirna,
-                                     fo_corr, corrmethod, '.')
-
-    pairid_index = _index_corr_pairid(fo_corr, has_mirna)
+    findex = _index_feat(gff_ufeat, has_mirna)
 
     ## PART4: start consolidating features ...
     gff_allfeatures = os.path.join(outdir, 'features.gff')
@@ -276,60 +342,13 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna):
                 ## getting info...
                 ncount = ncount_dict[tssid]
 
-                mirna_partner = []
-                if pairid_index.has_key(tssid):
-                    for cmirna in pairid_index[tssid]:
-                        if has_mirna:
-                            cmirna, n = cmirna.split(':')
-                            if mirna == cmirna:
-                                n = int(n)
-                            else:
-                                continue
-                        else:
-                            n = cmirna
+                if findex.has_key(tssid):
+                    for n in findex[tssid]:
+                        newline = linecache.getline(gff_ufeat, int(n))
+                        newline = newline.split('\t')
+                        newline[5] = ncount
 
-                        ## feature: correlation (corr)
-                        cline =  linecache.getline(fo_corr, n).strip().split('\t')
-                        corr  = cline[5]
-                        cinfo = cline[8].split(';')
-
-                        ## feature: mirna (mprox)
-                        mstart = int(get_value_from_keycolonvalue_list('mirna_start', cinfo))
-                        mstop = int(get_value_from_keycolonvalue_list('mirna_stop', cinfo))
-
-                        d = mirna_proximity.calculate_distance(start, stop, mstart, mstop, strand)
-                        mprox = str(mirna_proximity.distance_score(d))
-
-                        mirna_info = ';'.join([';'.join(cinfo),
-                                               'distance:'+str(d),
-                                               'corrmethod:'+corrmethod])
-                        mirna_partner.append([corr, mprox, mirna_info])
-
-                    #print '\t'.join(['>>', tssid] + pairid_index[tssid])
-
-                else:
-                    mirna_partner.append(['0', '0', ''])
-
-                ## features: cpg, cons, tata (cct)
-                for m in mirna_partner:
-                    corr, mprox, mirna_info = m
-
-                    for t in features_index[tssid]:
-                        fline = linecache.getline(gff_1kbfeatures, t).strip().split('\t')
-                        cct = fline[7]
-                        info_region = fline[8]
-
-                        ## write out!
-                        newfeatures = ';'.join([cct,
-                                                'mirna_prox:' + mprox,
-                                                'corr:'       + corr])
-
-                        newinfo = ';'.join([info_region,  mirna_info])
-
-                        newline = '\t'.join([chrom, '.', mirna,
-                                             start, stop, ncount,
-                                             strand, newfeatures, newinfo])
-                        out.write(newline + '\n')
+                        out.write('\t'.join(newline))
 
     return gff_allfeatures
 
@@ -342,8 +361,13 @@ def main(f_config, gff_infile, outdir, has_mirna, make_plots):
     listoffeatures = cparser.get('promi2', 'features').split(',')
     labelfile = cparser.get('configs', 'labelfile')
 
+    if 'corr' in listoffeatures:
+        is_consider_corr = True
+    else:
+        is_consider_corr = False
+
     ## Extract features
-    gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna)
+    gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna, is_consider_corr)
 
     ## Run Promirna
     fo_predictions = os.path.join(outdir,
