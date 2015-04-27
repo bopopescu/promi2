@@ -74,13 +74,13 @@ New! (todo)
 * * *
 # Enabling Correlation
 ## Using correlation feature with promi2
-1. At the "Creating the training set" step, you will need to create a dataset which contains the extracted correlation
+1. At the "**Creating the training set**" step, you will need to create a dataset which contains the extracted correlation
  - Make sure `srnaseqmatrix =` and `cageseqmatrix =`, in the [config](config.ini) file, is filled in
-2. At the "Training the model" step, you will neet to tell the program to include correlation as a feature
+2. At the "**Training the model**" step, you will neet to tell the program to include correlation as a feature
  - In `trainingfeatures =`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr`
  - Also make sure to train with training set with the extracted correlations 
    (e.g. "TrainingSet-corr.gff" -- not "TrainingSet.gff")
-3. At the "Using the model" step, you will need to tell promi2 to use the corrlelation feature as well as the new parameters
+3. At the "**Using the model**" step, you will need to tell promi2 to use the corrlelation feature as well as the new parameters
  - Update `params =` to the resulting `*finalparams` file generated in the previous step
  - In `features =`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr`
  - **Note:** promi2 also expects `cageseqmatrix =` to be filled out
