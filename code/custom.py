@@ -17,8 +17,18 @@ import promi2
 import label
 
 usage = """
-- Given gff infile, extract cpg,cons,tata,mprox,corr features
-- you will need to set parameters in tc-normalization
+Action:
+- 0. Given gff infile containing a list of positions
+     (and possibly miRNA partners)
+- 1. Extracts cpg,cons,tata,mprox,corr features
+- 2. Calculates probabilty of promoter
+- 3. Labels position as intra/intergenic based on miRNA
+- 4. Generate plots (when "-p" is given)
+
+Notes:
+- 'tcnorm.ini' needs to be filled in
+- for enabling plot generation, add "-p"
+- when miRNA partner is given, add "-m"
 """
 def _reformat_infile_gff2tcnorm(infile, outfile):
     with open(outfile, 'w') as out:
