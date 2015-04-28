@@ -74,6 +74,8 @@ def _verify_valid_distance(infile):
         print "## There are some bad positions in your input file:"
         print "## chromosome or strand differences between TSS and miRNA pair"
         print out_bad
+    else:
+        os.remove(out_bad)
 
     return out_good
 
