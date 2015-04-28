@@ -216,7 +216,7 @@ def _plt_percountr(dat, independentpdf=False, fname='xpercount.pdf'):
         pm_den.plot()
     return
 
-def _plt_distr(dat, col, title='', pfill='label', independentpdf=False, fname='xdistr.pdf'):
+def _plt_distr(dat, col, title='', splitBy_pfill=True, pfill='label', independentpdf=False, fname='xdistr.pdf'):
     df = dat[dat[pfill] != 'NA'] ## remove invalid pairs
     n  = len(df)
     df = {col: robjects.FloatVector(list(df[col])),
@@ -227,13 +227,17 @@ def _plt_distr(dat, col, title='', pfill='label', independentpdf=False, fname='x
         ggplot2.ggtitle('%s [Total = %s]' % (title, n))
 
     ## Plot1: counts
-    p1 = pp + ggplot2.aes_string(x=col, fill=pfill)
+    if splitBy_pfill:
+        p1 = pp + ggplot2.aes_string(x=col, fill=pfill)
+    else:
+        p1 = pp + ggplot2.aes_string(x=col)
 
     ## Plot2: density
-    p2 = pp + \
-        ggplot2.aes_string(x=col, fill=pfill, y='..density..') + \
-        ggplot2.geom_density(alpha=.5, origin=-500)
-
+    if splitBy_pfill:
+        p2 = pp + ggplot2.aes_string(x=col, fill=pfill, y='..density..')
+    else:
+        p2 = pp + ggplot2.aes_string(x=col, y='..density..')
+    p2 = p2 + ggplot2.geom_density(alpha=.5, origin=-500)
 
     if col == 'distance':
         p1 = p1 + \
@@ -334,18 +338,27 @@ def main(infile, outdir, config):
 
     _plt_pier(dat, 'All TSS-[miRNA,NA] pairs')
     _plt_pier(dat, 'All valid TSS-miRNA pairs', True)
-    _plt_distr(dat, 'distance',    'All valid tss-miRNA pairs')
-    if not ignoreCorr: _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs')
+    _plt_distr(dat, 'distance', 'All valid tss-miRNA pairs', False)
+    _plt_distr(dat, 'distance', 'All valid tss-miRNA pairs')
+    if not ignoreCorr:
+        _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs', False)
+        _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs')
 
     _plt_percountr(dat)
 
-    _plt_pier(dat_tss,   'Distinct TSS (label from closest miRNA)')
-    _plt_distr(dat_tss, 'distance',    'TSS to closest miRNA')
-    if not ignoreCorr: _plt_distr(dat_tss, 'correlation', 'TSS to closest miRNA')
+    _plt_pier(dat_tss, 'TSS (label from closest miRNA)')
+    _plt_distr(dat_tss, 'distance', 'TSS to closest miRNA', False)
+    _plt_distr(dat_tss, 'distance', 'TSS to closest miRNA')
+    if not ignoreCorr:
+        _plt_distr(dat_tss, 'correlation', 'TSS to closest miRNA', False)
+        _plt_distr(dat_tss, 'correlation', 'TSS to closest miRNA')
 
-    _plt_pier(dat_mirna, 'Distinct miRNA')
-    _plt_distr(dat_mirna, 'distance',    'miRNA to closest TSS')
-    if not ignoreCorr: _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
+    _plt_pier(dat_mirna, 'miRNA')
+    _plt_distr(dat_mirna, 'distance', 'miRNA to closest TSS', False)
+    _plt_distr(dat_mirna, 'distance', 'miRNA to closest TSS')
+    if not ignoreCorr:
+        _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS', False)
+        _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
 
     grdevices.dev_off()
     print '## Plot file:'
