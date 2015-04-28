@@ -83,11 +83,14 @@ python2.7 summarize-results.py -f '../test/test-summary/Predictions.*' -o ../Tes
 ## You need to first update "config.ini" as well as "tcnorm.ini"
 python2.7 custom.py -i ../test/test-custom.gff -o ../Testout-custom -p
 ```
-**Note:** `-p` enables plotting of results (with `plot.py`; you will need to install the plotting dependencies first)
+**Note:** `-p` enables plotting of results with `plot.py` (plotting dependencies need to first be installed)
 
 **Note:** `-m` designate that the infile has miRNA partners in column 9 
 (and that miRNA partners do not been to be found)
 
+
+* * *
+One main difference between `promi2.py` and `custom.py` is that `promi2.py` assumes you start with normalized CAGE tag counts in a matrix, whereas `custom.py` pulls the tag counts from raw data and normalizes them.
 
 * * *
 # Enabling Correlation
