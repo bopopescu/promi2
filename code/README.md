@@ -59,6 +59,13 @@ python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2 -c config.ini
 **About: the config.ini file**
 - You will need to update the paths in the [config](config.ini) file
 
+**Tip:** When you already have the extracted-features.gff file, you can run PROmiRNA directly with `-f`.
+```
+python2.7 promi2.py -i ../test/test-features.gff -f -o ../Testout-promi2predict
+```
+_(Note: In the config file, you will still need to fill in `params =` and `features =`)_
+
+
 ## Summarizing results
 1. `summarize-results.py` - summarize promi2 predictions from a series of samples
 
