@@ -13,10 +13,13 @@ import correlation
 import gff_unify_features
 import promirna
 
-usage = """Runs promi2
-
-Example:
+usage = """- Runs promi2
+  EXAMPLE:
 python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2
+
+- When the features.gff file is already available, use the '-f' option
+  EXAMPLE:
+python2.7 promi2.py -i ../test/test-features.gff -f -o ../Testout-promi2predict
 """
 def _read_params(f_param):
     params_dict = {}
