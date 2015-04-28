@@ -74,9 +74,20 @@ python2.7 summarize-results.py -f '../test/test-summary/Predictions.*' -o ../Tes
 ```
 **Note:** `-s` is to print only results where mirna_prox score is > 0
 
+
 * * *
-New! (todo)
-- custom.py
+## Using the model2: custom
+- `custom.py` - given a gff input file ([example](../test/test-custom.gff)) containing a list of positions (and possibly miRNA partners in column 9), performs feature extraction, calculation of probabilities, labelling of positions, and plotting of results
+
+```
+## You need to first update "config.ini" as well as "tcnorm.ini"
+python2.7 custom.py -i ../test/test-custom.gff -o ../Testout-custom -p
+```
+**Note:** `-p` enables plotting of results (with `plot.py`; you will need to install the plotting dependencies first)
+
+**Note:** `-m` designate that the infile has miRNA partners in column 9 
+(and that miRNA partners do not been to be found)
+
 
 * * *
 # Enabling Correlation
