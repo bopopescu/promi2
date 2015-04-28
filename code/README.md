@@ -42,22 +42,22 @@ python2.7 training.py -i ../Test-tset/TrainingSet.gff -c config.ini
 python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2 -c config.ini
 ```
 
-**About: the gff input file**
-- This is the file containing the putative TSSs you want to classify
-- The format consists of 9 tab-delimited columns:
- - 1. chromosome
- - 2. source (field is not used)
- - 3. feature (field is not used)
- - 4. start of 1kb region around TSS (-500 of mid putative TSS)
- - 5. stop of 1kb region around TSS (+500 of mid putative TSS)
- - 6. normalized tag counts
- - 7. strand
- - 8. '.' (field is not used)
- - 9. 'start:<start>;stop:<stop>' of putative TSS
-- An example of the format is shown [here](../test/test.gff)
+- **About: the gff input file**
+ - This is the file containing the putative TSSs you want to classify
+ - The format consists of 9 tab-delimited columns:
+  - 1. chromosome
+  - 2. source (field is not used)
+  - 3. feature (field is not used)
+  - 4. start of 1kb region around TSS (-500 of mid putative TSS)
+  - 5. stop of 1kb region around TSS (+500 of mid putative TSS)
+  - 6. normalized tag counts
+  - 7. strand
+  - 8. '.' (field is not used)
+  - 9. 'start:<start>;stop:<stop>' of putative TSS
+ - An example of the format is shown [here](../test/test.gff)
 
-**About: the config.ini file**
-- You will need to update the paths in the [config](config.ini) file
+- **About: the config.ini file**
+ - You will need to update the paths in the [config](config.ini) file
 
 **Tip:** When you already have the extracted-features.gff file, you can run PROmiRNA directly with `-f`.
 ```
