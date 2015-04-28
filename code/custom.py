@@ -112,27 +112,6 @@ def _interpret_tss_mirna_pairings(gff_infile, gff_tss, gff_mirna, pair_pos):
                     out.write(newline + '\n')
     return
 
-def _index_mprox_pairid(gff_mprox):
-    pairid_index = {}
-    with open(gff_mprox) as f:
-        c = 0
-        for l in f:
-            c += 1
-
-            chrom, _, _, start, stop, _, strand, _, info = l.strip().rsplit('\t')
-            info    = info.split(';')
-
-            pid = '.'.join([chrom, start, stop, strand])
-            mirna = get_value_from_keycolonvalue_list('mirna_id', info)
-            val = c
-
-            try:
-                pairid_index[pid].append(val)
-            except KeyError:
-                pairid_index[pid] = [val]
-
-    return pairid_index
-
 def _index_feat(gff_ufeat, has_mirna):
     pairid_index = {}
     with open(gff_ufeat) as f:
@@ -146,30 +125,6 @@ def _index_feat(gff_ufeat, has_mirna):
             pid = '.'.join([chrom, start, stop, strand])
             if has_mirna:
                 ##FIXME
-                mirna = get_value_from_keycolonvalue_list('mirna_query', info)
-                val = '%s:%s' % (mirna, c)
-            else:
-                val = c
-
-            try:
-                pairid_index[pid].append(val)
-            except KeyError:
-                pairid_index[pid] = [val]
-
-    return pairid_index
-
-def _index_corr_pairid(gff_corr, has_mirna):
-    pairid_index = {}
-    with open(gff_corr) as f:
-        c = 0
-        for l in f:
-            c += 1
-
-            chrom, _, _, start, stop, _, strand, _, info = l.strip().rsplit('\t')
-            info    = info.split(';')
-
-            pid = '.'.join([chrom, start, stop, strand])
-            if has_mirna:
                 mirna = get_value_from_keycolonvalue_list('mirna_query', info)
                 val = '%s:%s' % (mirna, c)
             else:
@@ -203,22 +158,8 @@ def _reformat_tss_to_1kb(posfile, gff1kb_infile):
                 out.write(newline + '\n')
     return
 
-def _index_1kbfeatures(gff_1kbfeatures):
-    feature_index = {}
-    with open(gff_1kbfeatures) as f:
-        c = 0
-        for l in f:
-            c += 1
-            chrom, _, _, start, stop, _, strand, features, _ = l.split('\t')
-
-            pos = '.'.join([chrom, start, stop, strand])
-
-            try:
-                feature_index[pos].append(c)
-            except KeyError:
-                feature_index[pos] = [c]
-
-    return feature_index
+def _interpret_mprox(gff_infile):
+    pass
 
 def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider_corr):
     cparser = SafeConfigParser()
@@ -276,8 +217,6 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
                   f_fasta, f_chromsizes, d_phastcons, TRAP, f_psemmatrix,
                   gff_1kbfeatures)
 
-    features_index = _index_1kbfeatures(gff_1kbfeatures)
-
     ## PART3: compute mprox ...
     outdir_tmp = os.path.join(outdir, 'intermediates')
     ensure_dir(outdir_tmp, False)
@@ -285,7 +224,13 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
     gff_mproxfeatures = os.path.join(outdir_tmp, 'features_mprox.gff')
     gff_ufeat1 = os.path.join(outdir_tmp, 'features.1kb.mprox.gff')
 
-    mirna_proximity.main(gff1kb_infile, mirbase_gff2, gff_mproxfeatures)
+    if has_mirna:
+        ##FIXME
+        _interpret_mprox(gff_infile)
+    else:
+        mirna_proximity.main(gff1kb_infile, mirbase_gff2, gff_mproxfeatures)
+
+
     gff_unify_features.main(gff_1kbfeatures, gff_mproxfeatures, 'mirna_prox', '0', gff_ufeat1, True)
 
     ## PART4: compute corr
