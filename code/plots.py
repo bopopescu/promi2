@@ -44,6 +44,39 @@ def _check_labelling(infile, labelfile):
         lb.main(infile, labelfile, outfile)
         return outfile
 
+def _verify_valid_distance(infile):
+    out_good = infile + '.validdistance'
+    out_bad = infile + '.badpair'
+
+    with open(out_bad, 'w') as outB:
+        with open(out_good, 'w') as outG:
+            with open(infile) as f:
+                for l in f:
+                    l = l.strip().split('\t')
+
+                    info = l[8].split(';')
+                    d    = get_value_from_keycolonvalue_list('distance', info)
+
+                    if d == 'NA':
+                        chrom  = l[0]
+                        start  = l[3]
+                        stop   = l[4]
+                        strand = l[6]
+                        mirna  = get_value_from_keycolonvalue_list('mirna_query', info)
+
+                        badpair = 'chr%s:%s..%s,%s\t%s' % (chrom, start, stop, strand,
+                                                           mirna)
+                        outB.write(badpair + '\n')
+                    else:
+                        outG.write('\t'.join(l) + '\n')
+
+    if os.stat(out_bad).st_size != 0:
+        print "## There are some bad positions in your input file:"
+        print "## chromosome or strand differences between TSS and miRNA pair"
+        print out_bad
+
+    return out_good
+
 def _filterPredictionsByClass_reformat2gff(infile, outdir, keep='prom'):
     outfile = os.path.join(outdir, os.path.basename(infile)+'.filtered')
     with open(outfile, 'w') as out:
@@ -279,6 +312,7 @@ def main(infile, outdir, config):
     labelfile = cparser.get('configs', 'labelfile')
 
     infile = _check_labelling(infile, labelfile)
+    infile = _verify_valid_distance(infile)
     infile = _filterPredictionsByClass_reformat2gff(infile, outdir)
 
     bname = os.path.basename(infile)
