@@ -279,15 +279,14 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
     features_index = _index_1kbfeatures(gff_1kbfeatures)
 
     ## PART3: compute mprox ...
-    if not has_mirna:
-        outdir_tmp = os.path.join(outdir, 'intermediates')
-        ensure_dir(outdir_tmp, False)
+    outdir_tmp = os.path.join(outdir, 'intermediates')
+    ensure_dir(outdir_tmp, False)
 
-        gff_mproxfeatures = os.path.join(outdir_tmp, 'features_mprox.gff')
-        gff_ufeat1 = os.path.join(outdir_tmp, 'features.1kb.mprox.gff')
+    gff_mproxfeatures = os.path.join(outdir_tmp, 'features_mprox.gff')
+    gff_ufeat1 = os.path.join(outdir_tmp, 'features.1kb.mprox.gff')
 
-        mirna_proximity.main(gff1kb_infile, mirbase_gff2, gff_mproxfeatures)
-        gff_unify_features.main(gff_1kbfeatures, gff_mproxfeatures, 'mirna_prox', '0', gff_ufeat1, True)
+    mirna_proximity.main(gff1kb_infile, mirbase_gff2, gff_mproxfeatures)
+    gff_unify_features.main(gff_1kbfeatures, gff_mproxfeatures, 'mirna_prox', '0', gff_ufeat1, True)
 
     ## PART4: compute corr
     if is_consider_corr:
