@@ -328,6 +328,7 @@ def main(infile, outdir, config):
     dat_mirna = _item_findClosestPartner(dat, 'mirna', ignoreCorr)
     dat_tss   = _item_findClosestPartner(dat, 'tss',   ignoreCorr)
 
+    print '## Generating plot file...'
     grdevices = importr('grDevices')
     grdevices.pdf(file=pdf_rplots)
 
@@ -347,7 +348,7 @@ def main(infile, outdir, config):
     if not ignoreCorr: _plt_distr(dat_mirna, 'correlation', 'miRNA to closest TSS')
 
     grdevices.dev_off()
-    print '## Generating plot file...'
+    print '## Plot file:'
     print pdf_rplots
     return pdf_rplots
 
