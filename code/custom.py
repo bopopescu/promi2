@@ -120,11 +120,10 @@ def _index_feat(gff_ufeat, has_mirna):
             c += 1
 
             chrom, _, _, start, stop, _, strand, _, info = l.strip().rsplit('\t')
-            info    = info.split(';')
+            info    = re.split('[;@]', info)
 
             pid = '.'.join([chrom, start, stop, strand])
             if has_mirna:
-                ##FIXME
                 mirna = get_value_from_keycolonvalue_list('mirna_query', info)
                 val = '%s:%s' % (mirna, c)
             else:
@@ -158,8 +157,62 @@ def _reformat_tss_to_1kb(posfile, gff1kb_infile):
                 out.write(newline + '\n')
     return
 
-def _interpret_mprox(gff_infile):
-    pass
+def _interpret_mprox(gff_infile, mirbase_gff2, outfile):
+    mbase_lookup = {}
+    with open(mirbase_gff2) as f:
+        for l in f:
+            if l.startswith('#'): continue
+
+            l = l.strip().split('\t')
+            chrom = re.sub('^[Cc]hr', '', l[0])
+            start = l[3]
+            stop  = l[4]
+            strand = l[6]
+
+            info = re.split('["]', l[8])
+            macc = info[1]
+            mid  = info[3].lower()
+
+            try:
+                mbase_lookup[mid].append([chrom, start, stop, strand, macc])
+            except KeyError:
+                mbase_lookup[mid] = [[chrom, start, stop, strand, macc]]
+
+    mbase_mirna = mbase_lookup.keys()
+
+    with open(outfile, 'w') as out:
+        with open(gff_infile) as f:
+            for l in f:
+                chrom, _, _, tstart, tstop, _, strand, _, mirna = l.strip().split('\t')
+                mirna = mirna.lower()
+
+                if mirna in mbase_mirna:
+                    for m in mbase_lookup[mirna]:
+                        mchrom, mstart, mstop, mstrand, macc = m
+
+                        if chrom != mchrom or strand != mstrand:
+                            d = 'NA'
+                            mprox = 0
+                        else:
+                            d = mirna_proximity.calculate_distance(tstart, tstop, mstart, mstop, strand)
+                            mprox = mirna_proximity.distance_score(d)
+
+                        newinfo = ';'.join(['distance:%s' % d,
+                                            'mirna_acc:%s' % macc,
+                                            'mirbase_id:%s' % mirna,
+                                            'mirna_start:%s' % mstart,
+                                            'mirna_stop:%s' % mstop,
+                                            'mirna_query:%s' % mirna])
+
+                        newline = '\t'.join([chrom, '.', mirna,
+                                             tstart, tstop, str(mprox), strand,
+                                             '.', newinfo])
+                        out.write(newline + '\n')
+                else:
+                    ## Here is for when listed mirna is not found in mirbase
+                    ## FIXME: right now assumes listed mirna is found in mirbase
+                    pass
+    return outfile
 
 def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider_corr):
     cparser = SafeConfigParser()
@@ -225,11 +278,9 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
     gff_ufeat1 = os.path.join(outdir_tmp, 'features.1kb.mprox.gff')
 
     if has_mirna:
-        ##FIXME
-        _interpret_mprox(gff_infile)
+        _interpret_mprox(gff_infile, mirbase_gff2, gff_mproxfeatures)
     else:
         mirna_proximity.main(gff1kb_infile, mirbase_gff2, gff_mproxfeatures)
-
 
     gff_unify_features.main(gff_1kbfeatures, gff_mproxfeatures, 'mirna_prox', '0', gff_ufeat1, True)
 
@@ -288,12 +339,17 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
 
                 if findex.has_key(tssid):
                     for n in findex[tssid]:
+                        if has_mirna:
+                            m, n = n.split(':')
+                            if m != mirna: continue
+
                         newline = linecache.getline(gff_ufeat, int(n))
                         newline = newline.split('\t')
+
+                        newline[2] = mirna
                         newline[5] = ncount
 
                         out.write('\t'.join(newline))
-
     return gff_allfeatures
 
 def main(f_config, gff_infile, outdir, has_mirna, make_plots):
@@ -354,6 +410,7 @@ Tab-separated columns should be like:
                         help='''Flag to designate that INFILE has miRNA in column 9
 e.g. tss-mirna pairing is already provided &
 program does not need to look for pairs
+Note: Listed miRNA must be in miRBase
 ''')
 
     parser.add_argument('-p', dest='make_plots',
