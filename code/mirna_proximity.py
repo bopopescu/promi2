@@ -153,12 +153,13 @@ def mirna_proximity(fi_cage, f_mirna, f_out, swapcol=True):
 
 
 def main(f_cage, f_mirna, f_out):
+    f_out = os.path.abspath(f_out)
+    ensure_dir(f_out)
+
     mirna_proximity(f_cage, f_mirna, f_out)
+    return f_out
 
 if __name__ == '__main__':
-    cparser = SafeConfigParser()
-    cparser.read('config.ini')
-
     parser = argparse.ArgumentParser(description=usage,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
@@ -173,19 +174,11 @@ Default = "./mirna_proximity.gff"''')
 
     ## miRBase files
     parser.add_argument('--gff2', dest='gff2',
-                        default=cparser.get('mirbase','gff2'),
+                        default='../data/miRBase/v20/hsa.gff2',
                         help='miRBase hsa.gff2 file')
-    #parser.add_argument('--mirna', dest='mirna',
-    #                    default=cparser.get('mirbase','mirna'),
-    #                    help='miRBase mirna.txt file')
-    #parser.add_argument('--context', dest='context',
-    #                    default=cparser.get('mirbase','context'),
-    #                    help='miRBase mirna_context.txt file')
-
 
     ##get at the arguments
     args = parser.parse_args()
 
     ## do something..
-    ensure_dir(args.outfile)
     main(args.infile, args.gff2, args.outfile)
