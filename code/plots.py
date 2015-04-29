@@ -348,13 +348,12 @@ def main(infile, outdir, config):
     grdevices = importr('grDevices')
     grdevices.pdf(file=pdf_rplots)
 
-    _plt_pier(dat, 'All TSS-[miRNA,NA] pairs')
-    _plt_pier(dat, 'All valid TSS-miRNA pairs', True)
-    _plt_distr(dat, 'distance', 'All valid tss-miRNA pairs', False)
-    _plt_distr(dat, 'distance', 'All valid tss-miRNA pairs')
+    _plt_pier(dat, 'All predicted TSS-miRNA pairs', True)
+    _plt_distr(dat, 'distance', 'All predicted tss-miRNA pairs', False)
+    _plt_distr(dat, 'distance', 'All predicted tss-miRNA pairs')
     if not ignoreCorr:
-        _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs', False)
-        _plt_distr(dat, 'correlation', 'All valid tss-miRNA pairs')
+        _plt_distr(dat, 'correlation', 'All predicted tss-miRNA pairs', False)
+        _plt_distr(dat, 'correlation', 'All predicted tss-miRNA pairs')
 
     _plt_percountr(dat)
 
