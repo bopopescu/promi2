@@ -487,6 +487,8 @@ def feature_closest_corr(f_querygff,
     return fo_corr
 
 def main(files, outdir, N, percent_lib, is_get_id, f_config, verbose = False):
+    if os.path.isdir(outdir): sys.exit('## ERROR: "%s" already exists' % outdir)
+
     cparser = SafeConfigParser()
     cparser.read(f_config)
     verbose = True
