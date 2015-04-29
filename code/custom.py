@@ -244,11 +244,14 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
 
     ncount_dict = {}
     with open(fo_bed) as f:
-        for l in f:
-            l = l.strip().split('\t')
-            _, chrom, start, _, stop, strand = re.split('[r:.,]', l[3])
-            pos = '.'.join([chrom, start, stop, strand])
-            ncount_dict[pos] = l[6]
+        for line in f:
+            l = line.strip().split('\t')
+            try:
+                _, chrom, start, _, stop, strand = re.split('[r:.,]', l[3])
+                pos = '.'.join([chrom, start, stop, strand])
+                ncount_dict[pos] = l[6]
+            except ValueError:
+                print '#[tcBedSpltErr]: %s' % line,
 
     ## 1d. setup outfile
     f_rle = re.sub('max_tpm.bed$', 'tpm_rle.matrix', fo_bed)
@@ -335,7 +338,10 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
                 tssid  = '.'.join([chrom, start, stop, strand])
 
                 ## getting info...
-                ncount = ncount_dict[tssid]
+                try:
+                    ncount = ncount_dict[tssid]
+                except KeyError:
+                    ncount = '0'
 
                 if findex.has_key(tssid):
                     for n in findex[tssid]:
