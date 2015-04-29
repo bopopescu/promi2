@@ -40,12 +40,12 @@ def gff_unify_features(gff_a, gff_b, fname, dfvalue, f_out,
                     ## yes overlap of features w/ mirna_proximity
                     x_b      = l[14]
                     info_b   = l[17]
-                    mirna_id = get_value_from_keycolonvalue_list('mirna_id',
+                    mirbase_id = get_value_from_keycolonvalue_list('mirbase_id',
                                                                  info_b.split(';'))
                 else:
                     x_b        = dfvalue
                     info_b     = ''
-                    mirna_id   = '.'
+                    mirbase_id   = '.'
 
                 features = '%s;%s:%s' % (features, fname, x_b)
                 new_info = info_a + '@' + info_b
@@ -54,7 +54,7 @@ def gff_unify_features(gff_a, gff_b, fname, dfvalue, f_out,
                     newline = '\t'.join([chrom, l[1], l[2], start, stop,
                                          count, strand, features, new_info])
                 else:
-                    newline = '\t'.join([chrom, 'putative_tss', mirna_id, start, stop,
+                    newline = '\t'.join([chrom, 'putative_tss', mirbase_id, start, stop,
                                          count, strand, features, new_info])
                 out.write(newline + '\n')
 

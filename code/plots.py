@@ -113,10 +113,10 @@ def _read_dat(gff_infile):
             tss = ','.join([chrom, tstart, tstop, strand])
 
             info  = l[8].split(';')
-            mirna_id = get_value_from_keycolonvalue_list('mirbase_id', info)
-            mstart = get_value_from_keycolonvalue_list('mirna_start', info)
-            mstop  = get_value_from_keycolonvalue_list('mirna_start', info)
-            label = get_value_from_keycolonvalue_list('mirna_label', info)
+            mirbase_id = get_value_from_keycolonvalue_list('mirbase_id', info)
+            mstart     = get_value_from_keycolonvalue_list('mirna_start', info)
+            mstop      = get_value_from_keycolonvalue_list('mirna_start', info)
+            label      = get_value_from_keycolonvalue_list('mirna_label', info)
 
             if label == '': label = 'NA'
             mirna = ','.join([chrom, mstart, mstop, strand])
@@ -127,10 +127,10 @@ def _read_dat(gff_infile):
                 distance = get_value_from_keycolonvalue_list('distance', info)
                 if distance == '': distance = 0
 
-            dat[n] = [tss, mirna, mirna_id, label, distance, abs(float(distance)), corr]
+            dat[n] = [tss, mirna, mirbase_id, label, distance, abs(float(distance)), corr]
 
     dat = pd.DataFrame.from_dict(dat, orient='index')
-    dat.columns = ['tss', 'mirna', 'mirna_id', 'label', 'Distance', 'distance', 'correlation']
+    dat.columns = ['tss', 'mirna', 'mirbase_id', 'label', 'Distance', 'distance', 'correlation']
     return dat
 
 def _item_findClosestPartner(dat, item, ignoreCorr):

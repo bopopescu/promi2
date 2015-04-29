@@ -61,8 +61,6 @@ def main(infile, labelfile, outfile):
                     label = 'NA'
                 else:
                     mirna = get_value_from_keycolonvalue_list('mirbase_id', info)
-                    if mirna == '':
-                        mirna = get_value_from_keycolonvalue_list('mirna_id', info)
 
                     mirna = re.match('^(\w*-\w*-\d*)', mirna).group(1)
                     if label_dict.has_key(mirna):

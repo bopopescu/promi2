@@ -49,7 +49,7 @@ def _pull_putative_prom(somefile, somelist, is_strict):
 
                 try:
                     info = l[8].split('@')[2].split(';')
-                    mirnaid = get_value_from_keycolonvalue_list('mirna_id', info)
+                    mirnaid = get_value_from_keycolonvalue_list('mirbase_id', info)
                     if mirnaid != '':
                         mirna = '%s:%s' % (mirna, mirnaid)
                     else:

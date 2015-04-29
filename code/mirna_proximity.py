@@ -104,13 +104,13 @@ def _make_newline(l, d):
     mirna_stop  = l[13]
 
     mirna_info  = re.sub(' |"', '', l[17]).strip().split(';')
-    mirna_acc = get_value_from_keycolonvalue_list('ACC', mirna_info, '=')
-    mirna_id  = get_value_from_keycolonvalue_list('ID', mirna_info, '=')
+    mirna_acc   = get_value_from_keycolonvalue_list('ACC', mirna_info, '=')
+    mirbase_id  = get_value_from_keycolonvalue_list('ID', mirna_info, '=')
 
 
     new_info = ';'.join(['distance:'+str(d),
                          #'region_start:'+region_up, 'region_stop:'+region_down,
-                         'mirna_acc:'+mirna_acc, 'mirna_id:'+mirna_id,
+                         'mirna_acc:'+mirna_acc, 'mirbase_id:'+mirbase_id,
                          'mirna_start:'+mirna_start, 'mirna_stop:'+mirna_stop])
 
     newline = '\t'.join([chrom, l[1], l[2], #'overlap', 'putative_tss',
