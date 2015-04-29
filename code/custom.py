@@ -369,6 +369,19 @@ def extractFeatures_given_gff(config, gff_infile, outdir, has_mirna, is_consider
                         out.write('\t'.join(newline))
     return gff_allfeatures
 
+def _filter_keepValidPairs(gff_features):
+    f_out = gff_features
+    f_all = gff_features + '.intermediate'
+    os.rename(gff_features, f_all)
+
+    with open(f_out, 'w') as out:
+        with open(f_all) as f:
+            for l in f:
+                info = l.strip().split('\t')[8]
+                if 'mirbase_id' in info:
+                    out.write(l)
+    return f_out
+
 def main(f_config, gff_infile, outdir, has_mirna, make_plots):
     ensure_dir(outdir)
 
@@ -387,7 +400,11 @@ def main(f_config, gff_infile, outdir, has_mirna, make_plots):
     _verify_infile(gff_infile)
 
     ## Extract features
-    gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna, is_consider_corr)
+    #gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna, is_consider_corr)
+
+    ## Don't consider TSS which does not have a partner miRNA
+    gff_allfeatures = os.path.join(outdir, 'features.gff') ##FIXME
+    gff_allfeatures = _filter_keepValidPairs(gff_allfeatures)
 
     ## Run Promirna
     fo_predictions = os.path.join(outdir,
