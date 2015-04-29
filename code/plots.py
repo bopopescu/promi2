@@ -189,19 +189,25 @@ def _plt_percountr(dat, independentpdf=False, fname='xpercount.pdf'):
           'label': robjects.StrVector(df['label']) }
     df = robjects.DataFrame(df)
 
-    pm = ggplot2.ggplot(df) + \
+    _pm = ggplot2.ggplot(df) + \
         ggplot2.geom_histogram(binwidth=1, origin=-.5, alpha=.5, position="identity") + \
         ggplot2.xlim(-.5, mx+1) + \
-        ggplot2.aes_string(x='count', fill='label') + \
         ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
         ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
 
-    pm_den = ggplot2.ggplot(df) + \
-        ggplot2.aes_string(x='count', fill='label', y='..density..') + \
+    _pm_den = ggplot2.ggplot(df) + \
         ggplot2.geom_density(binwidth=1, alpha=.5, origin=-.5) + \
         ggplot2.geom_histogram(binwidth=1, alpha=.33, position='identity', origin=-.5) + \
         ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
         ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
+
+    ## not split by label
+    pm     = _pm     + ggplot2.aes_string(x='count')
+    pm_den = _pm_den + ggplot2.aes_string(x='count', y='..density..')
+
+    ## split by label
+    pms     = _pm     + ggplot2.aes_string(x='count', fill='label')
+    pm_dens = _pm_den + ggplot2.aes_string(x='count', fill='label', y='..density..')
 
     if independentpdf:
         grdevices = importr('grDevices')
@@ -210,12 +216,16 @@ def _plt_percountr(dat, independentpdf=False, fname='xpercount.pdf'):
         pt_den.plot()
         pm.plot()
         pm_den.plot()
+        pms.plot()
+        pm_dens.plot()
         grdevices.dev_off()
     else:
         pt.plot()
         pt_den.plot()
         pm.plot()
         pm_den.plot()
+        pms.plot()
+        pm_dens.plot()
     return
 
 def _plt_distr(dat, col, title='', splitBy_pfill=True, pfill='label', independentpdf=False, fname='xdistr.pdf'):
