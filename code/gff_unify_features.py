@@ -59,10 +59,30 @@ def gff_unify_features(gff_a, gff_b, fname, dfvalue, f_out,
                 out.write(newline + '\n')
 
     os.system('rm '+f_out_tmp)
+    return
 
+def _verify_mirbaseID(gff_infile, gff_outfile):
+    with open(gff_outfile, 'w') as out:
+        with open(gff_infile) as f:
+            for l in f:
+                info = l.strip().split('\t')[8].split('@')
+                _x = info[-2].split(';')
+                _y = info[-1].split(';')
+
+                _x = get_value_from_keycolonvalue_list('mirbase_id', _x)
+                _y = get_value_from_keycolonvalue_list('mirbase_id', _y)
+
+                if _x == _y or _x == '' or _y == '':
+                    out.write(l)
+    return
 
 def main(gff_a, gff_b, fname, dfvalue, f_out, retainSourceFeature=False):
-    gff_unify_features(gff_a, gff_b, fname, dfvalue, f_out, retainSourceFeature)
+    tmpfile = f_out + '.tmp'
+    gff_unify_features(gff_a, gff_b, fname, dfvalue, tmpfile, retainSourceFeature)
+
+    _verify_mirbaseID(tmpfile, f_out)
+    os.remove(tmpfile)
+    return f_out
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
