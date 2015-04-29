@@ -12,6 +12,7 @@ import mirna_proximity
 import correlation
 import gff_unify_features
 import promirna
+import plots
 
 usage = """- Runs promi2
   EXAMPLE:
@@ -20,6 +21,8 @@ python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2
 - When the features.gff file is already available, use the '-f' option
   EXAMPLE:
 python2.7 promi2.py -i ../test/test-features.gff -f -o ../Testout-promi2predict
+
+- enable plotting with "-p"
 """
 def _read_params(f_param):
     params_dict = {}
@@ -112,7 +115,7 @@ def _cleanup_extra_positions(infile, outfile):
                     out.write(line)
     return outfile
 
-def main(f_config, gff_cage, is_gff, outdir):
+def main(f_config, gff_cage, is_gff, outdir, make_plots):
     cparser = SafeConfigParser()
     cparser.read(f_config)
 
@@ -191,6 +194,12 @@ def main(f_config, gff_cage, is_gff, outdir):
     print 'COMPUTING: "%s"...' % f_prediction
     promi2(f_param, listoffeatures, gff_allfeatures, f_prediction)
 
+    ## PART3: plots
+    if make_plots:
+        plotdir = os.path.join(outdir, 'plots')
+        ensure_dir(plotdir, False)
+        plots.main(f_prediction, plotdir, f_config)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=usage,
@@ -214,6 +223,15 @@ Tab-separated columns should be like:
                         action='store_true',
                         help='flag to specify that infile is already features.gff file')
 
+    parser.add_argument('-p', dest='make_plots',
+                        action='store_true',
+                        help='''Flag to enable plotting
+This requires extra packages to be pre-installed:
+- Python: pandas, matplotlib, rpy2
+- R: ggplot2
+
+''')
+
     parser.add_argument('-c', '--config', dest='f_config',
                         default='config.ini',
                         help='path to config file; default="config.ini"')
@@ -226,4 +244,4 @@ Tab-separated columns should be like:
     args = parser.parse_args()
 
     ## do something..
-    main(args.f_config, args.infile, args.is_gff, args.outdir)
+    main(args.f_config, args.infile, args.is_gff, args.outdir, args.make_plots)

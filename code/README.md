@@ -41,6 +41,7 @@ python2.7 training.py -i ../Test-tset/TrainingSet.gff -c config.ini
 
 python2.7 promi2.py -i ../test/test.gff -o ../Testout-promi2 -c config.ini
 ```
+**Note:** `-p` enables plotting of results with `plot.py` (plotting dependencies need to first be installed)
 
 - **About: the gff input file**
  - This is the file containing the putative TSSs you want to classify
@@ -85,7 +86,7 @@ python2.7 custom.py -i ../test/test-custom.gff -o ../Testout-custom -p
 ```
 **Note:** `-p` enables plotting of results with `plot.py` (plotting dependencies need to first be installed)
 
-**Note:** `-m` designate that the infile has miRNA partners in column 9 
+**Note:** `-m` designate that the infile has miRNA partners in column 9
 (and that miRNA partners do not been to be found)
 
 
@@ -99,7 +100,7 @@ One main difference between `promi2.py` and `custom.py` is that `promi2.py` assu
  - Make sure `srnaseqmatrix =` and `cageseqmatrix =`, in the [config](config.ini) file, is filled in
 2. At the "**Training the model**" step, you will neet to tell the program to include correlation as a feature
  - In `trainingfeatures =`, change `cpg,cons,tata,mirna_prox` to `cpg,cons,tata,mirna_prox,corr`
- - Also make sure to train with training set with the extracted correlations 
+ - Also make sure to train with training set with the extracted correlations
    (e.g. "TrainingSet-corr.gff" -- not "TrainingSet.gff")
 3. At the "**Using the model**" step, you will need to tell promi2 (or custom) to use the corrlelation feature as well as the new parameters
  - Update `params =` to the resulting `*finalparams` file generated in the previous step
