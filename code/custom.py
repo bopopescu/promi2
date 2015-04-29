@@ -34,6 +34,17 @@ Notes:
 Examples:
 python2.7 custom.py -i ../test/test-custom.gff -o ../Testout-custom -p [-m]
 """
+def _verify_infile(infile):
+    ## should not contain chromosome M
+    with open(infile) as f:
+        for l in f:
+            chrom = l.split('\t')[0]
+            chrom.upper()
+            if 'M' in chrom:
+                sys.exit('''## ERROR: please remove chrM from the input file\n%s''' %
+                         l)
+    return
+
 def _reformat_infile_gff2tcnorm(infile, outfile):
     with open(outfile, 'w') as out:
         pos = []
@@ -372,6 +383,9 @@ def main(f_config, gff_infile, outdir, has_mirna, make_plots):
     else:
         is_consider_corr = False
 
+    ## Make sure no chrM in infile
+    _verify_infile(gff_infile)
+
     ## Extract features
     gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna, is_consider_corr)
 
@@ -399,6 +413,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--infile', dest='infile',
                         required=True,
                         help='''Path to input gff input file.
+Should NOT include chromosome M.
 Tab-separated columns should be like:
   1. chrom
   2. "." (source; not used)
