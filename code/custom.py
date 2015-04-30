@@ -400,10 +400,9 @@ def main(f_config, gff_infile, outdir, has_mirna, make_plots):
     _verify_infile(gff_infile)
 
     ## Extract features
-    #gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna, is_consider_corr)
+    gff_allfeatures = extractFeatures_given_gff(f_config, gff_infile, outdir, has_mirna, is_consider_corr)
 
     ## Don't consider TSS which does not have a partner miRNA
-    gff_allfeatures = os.path.join(outdir, 'features.gff') ##FIXME
     gff_allfeatures = _filter_keepValidPairs(gff_allfeatures)
 
     ## Run Promirna
