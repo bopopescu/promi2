@@ -192,14 +192,12 @@ def _plt_percountr(dat, independentpdf=False, fname='xpercount.pdf'):
     _pm = ggplot2.ggplot(df) + \
         ggplot2.geom_histogram(binwidth=1, origin=-.5, alpha=.5, position="identity") + \
         ggplot2.xlim(-.5, mx+1) + \
-        ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
-        ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
+        ggplot2.ggtitle('miRNA [Total = %s]' % n)
 
     _pm_den = ggplot2.ggplot(df) + \
         ggplot2.geom_density(binwidth=1, alpha=.5, origin=-.5) + \
         ggplot2.geom_histogram(binwidth=1, alpha=.33, position='identity', origin=-.5) + \
-        ggplot2.ggtitle('miRNA [Total = %s]' % n) + \
-        ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
+        ggplot2.ggtitle('miRNA [Total = %s]' % n)
 
     ## not split by label
     pm     = _pm     + ggplot2.aes_string(x='count')
@@ -208,6 +206,13 @@ def _plt_percountr(dat, independentpdf=False, fname='xpercount.pdf'):
     ## split by label
     pms     = _pm     + ggplot2.aes_string(x='count', fill='label')
     pm_dens = _pm_den + ggplot2.aes_string(x='count', fill='label', y='..density..')
+
+    ## add xlabelling (need to be added after aes_string)
+    _xlab = ggplot2.labs(x='Number of TSS per miRNA (max = %s)' % mx)
+    pm      += _xlab
+    pm_den  += _xlab
+    pms     += _xlab
+    pm_dens += _xlab
 
     if independentpdf:
         grdevices = importr('grDevices')
