@@ -78,7 +78,7 @@ def estimate_betas(f_trainingset, trainingfeatures):
     ## estimating the beta parameters
     ## note: mirna_proximity is not considered in the fitting of betas
     f_beta_tmp = f_trainingset + '.parameters_beta.tmp'
-    os.system('R --slave --vanilla --args '+f_intermediate+' '+f_beta_tmp+\
+    os.system('R --subordinate --vanilla --args '+f_intermediate+' '+f_beta_tmp+\
               ' < external/choose_beta_params.R')
     betas = []
     with open(f_beta_tmp) as f:
